@@ -35,9 +35,57 @@ Opening a new codebase shouldn’t mean hours of guesswork, hidden dependencies,
 
 ---
 
+## Key Features
 
+### 🗺️ Architecture Visualization
+Visualize the entire repository as an interactive dependency graph.
+- See how files and modules connect
+- Zoom, pan, drag, and explore freely
+- Instantly identify tightly coupled areas
+  
+### 💥 Blast Radius Analysis
+Understand change impact before touching code.
+- Select a file and see all affected dependencies
+- Quickly assess risk for refactors or PRs
+- Ideal for large or legacy codebases
 
+### 👥 Code Ownership Insights
+Know who owns what.
+- Identify top contributors per file using Git history
+- Useful for reviews, debugging, and collaboration
 
+### 🔐 Security Scanner
+Detect common security risks automatically:
+- Hardcoded secrets and API keys
+- Dangerous `eval()` usage
+- SQL injection patterns
+- Debug statements left in production
+
+### 🧩 Pattern & Anti-Pattern Detection
+Automatically identifies:
+- Design patterns (Singleton, Factory, Observer)
+- React custom hooks
+- Anti-patterns such as god objects, high coupling, and circular dependencies
+
+### 📊 Codebase Health Score
+Get an instant A–F grade based on:
+- Dependency structure
+- Dead code indicators
+- Security issues
+- Coupling and complexity
+
+### 🔥 Activity Heatmap
+See which parts of the repository are most active.
+- Files colored by commit frequency
+- Quickly identify hot paths and unstable areas
+
+### 📈 Pull Request Impact Analysis
+Paste a PR URL to:
+- See changed files
+- Calculate blast radius
+- Understand review risk at a glance
+
+---
 
 
 
