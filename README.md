@@ -6,7 +6,6 @@
 
 **RepoLens IQ** turns any GitHub repository into **instant, actionable insights**—right in your browser.
 
-**Runs entirely in your browser.**
 **No installation. No backend. No data collection.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
