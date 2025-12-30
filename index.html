@@ -504,83 +504,41 @@ const Parser={
 
 var GitHub={
     token:null,
-    lastRequestTime:0,
-    minDelay:100,
-    retryCount:0,
-    maxRetries:3,
-    rateLimitReset:null,
-    fetch:function(url,retryAttempt){
+    rateLimit:{remaining:60,limit:60,reset:0},
+    fetch:function(url){
         var self=this;
-        retryAttempt=retryAttempt||0;
-        return new Promise(function(resolve,reject){
-            var now=Date.now();
-            var timeSinceLastRequest=now-self.lastRequestTime;
-            var delay=Math.max(0,self.minDelay-timeSinceLastRequest);
-            setTimeout(function(){
-                self.lastRequestTime=Date.now();
-                var h={'Accept':'application/vnd.github.v3+json'};
-                if(self.token)h['Authorization']='Bearer '+self.token;
-                fetch(url,{headers:h}).then(function(r){
-                    var remaining=r.headers.get('X-RateLimit-Remaining');
-                    var resetTime=r.headers.get('X-RateLimit-Reset');
-                    if(resetTime)self.rateLimitReset=parseInt(resetTime)*1000;
-                    if(!r.ok){
-                        if(r.status===429||(r.status===403&&remaining==='0')){
-                            var resetDate=self.rateLimitReset?new Date(self.rateLimitReset):null;
-                            var resetStr=resetDate?resetDate.toLocaleTimeString():'soon';
-                            var waitTime=resetDate?Math.max(0,resetDate.getTime()-Date.now()):60000;
-                            if(retryAttempt<self.maxRetries&&waitTime<300000){
-                                setTimeout(function(){
-                                    self.minDelay=Math.min(2000,self.minDelay*2);
-                                    resolve(self.fetch(url,retryAttempt+1));
-                                },Math.min(waitTime,60000));
-                                return;
-                            }
-                            throw new Error('Rate limit exceeded. Limit resets at '+resetStr+'. Add a GitHub token for 5,000 requests/hour.');
-                        }
-                        if(r.status===403){
-                            var errorMsg='Access denied (403). ';
-                            if(!self.token){
-                                errorMsg+='This repository may be private or requires authentication. Please add a GitHub Personal Access Token with "repo" scope.';
-                            }else{
-                                errorMsg+='Your token may not have the required permissions. Ensure your GitHub Personal Access Token has "repo" scope for private repositories.';
-                            }
-                            errorMsg+=' Create a token at: https://github.com/settings/tokens';
-                            throw new Error(errorMsg);
-                        }
-                        if(r.status===401)throw new Error('Invalid or expired GitHub token. Please check your token.');
-                        if(r.status===404)throw new Error('Repository not found. Check the owner/repo name.');
-                        throw new Error('GitHub API error: '+r.status+' '+r.statusText);
-                    }
-                    if(remaining&&parseInt(remaining)<10){
-                        self.minDelay=Math.min(500,self.minDelay*1.5);
-                    }else if(remaining&&parseInt(remaining)>100){
-                        self.minDelay=Math.max(100,self.minDelay*0.9);
-                    }
-                    resolve(r.json());
-                }).catch(function(e){
-                    if(e.message&&!e.message.includes('Rate limit')){
-                        if(retryAttempt<self.maxRetries){
-                            setTimeout(function(){
-                                resolve(self.fetch(url,retryAttempt+1));
-                            },Math.pow(2,retryAttempt)*1000);
-                            return;
-                        }
-                    }
-                    if(e.message)reject(e);
-                    if(e.name==='TypeError'&&e.message.includes('Failed to fetch')){
-                        reject(new Error('Network error. Check your internet connection or CORS settings.'));
-                        return;
-                    }
-                    reject(new Error('Failed to fetch from GitHub API: '+e.message));
-                });
-            },delay);
+        var h={'Accept':'application/vnd.github.v3+json'};
+        if(this.token)h['Authorization']='Bearer '+this.token;
+        return fetch(url,{headers:h}).then(function(r){
+           // Track rate limit from headers
+            var rem=r.headers.get('x-ratelimit-remaining');
+            var lim=r.headers.get('x-ratelimit-limit');
+            var rst=r.headers.get('x-ratelimit-reset');
+            if(rem!==null)self.rateLimit.remaining=parseInt(rem,10);
+            if(lim!==null)self.rateLimit.limit=parseInt(lim,10);
+            if(rst!==null)self.rateLimit.reset=parseInt(rst,10);
+            if(!r.ok)throw new Error(r.status===401?'Invalid token':r.status===403?'Rate limited - add a GitHub token for 5000 req/hour':r.status===404?'Repository not found':r.status===429?'Rate limited (429) - add a GitHub token':'Error '+r.status);
+            return r.json();
         });
     },
-    getFile:function(o,r,p){
+              getRateLimit:function(){
+        var self=this;
+        var h={'Accept':'application/vnd.github.v3+json'};
+        if(this.token)h['Authorization']='Bearer '+this.token;
+        return fetch('https://api.github.com/rate_limit',{headers:h}).then(function(r){return r.json();}).then(function(d){
+            if(d.resources&&d.resources.core){
+                self.rateLimit.remaining=d.resources.core.remaining;
+                self.rateLimit.limit=d.resources.core.limit;
+                self.rateLimit.reset=d.resources.core.reset;
+            }
+            return self.rateLimit;
+        }).catch(function(){return self.rateLimit;});
+    },
+getFile:function(o,r,p){
         return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/contents/'+p).then(function(d){return d.content?atob(d.content):null;}).catch(function(){return null;});
     },
     getCommits:function(o,r,path,limit){
+        if(this.rateLimit.remaining<20&&!this.token)return Promise.resolve([]);
         return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/commits?per_page='+(limit||30)+(path?'&path='+path:'')).catch(function(){return[];});
     },
     getBlame:function(o,r,path){
@@ -598,7 +556,35 @@ var GitHub={
             });
         }).catch(function(){return null;});
     },
-    scan:function(o,r,cb,p,d){
+    scanTree:function(o,r,cb){
+        var self=this;
+        if(cb)cb('Fetching repository tree...');
+        // First get repo info to find default branch
+        return this.fetch('https://api.github.com/repos/'+o+'/'+r).then(function(repo){
+            var branch=repo.default_branch||'main';
+            if(cb)cb('Loading file tree ('+branch+')...');
+            // Get full tree in one request with recursive flag
+            return self.fetch('https://api.github.com/repos/'+o+'/'+r+'/git/trees/'+branch+'?recursive=1');
+        }).then(function(tree){
+            if(!tree.tree)throw new Error('Invalid tree response');
+            var f=[];
+            tree.tree.forEach(function(i){
+                if(i.type!=='blob')return;
+                var name=i.path.includes('/')?i.path.substring(i.path.lastIndexOf('/')+1):i.path;
+                // Check if in ignored directory
+                var pathParts=i.path.split('/');
+                var ignored=pathParts.slice(0,-1).some(function(part){return IGNORE.has(part);});
+                if(ignored)return;
+                if(!Parser.isIncluded(name))return;
+                var folder=i.path.includes('/')?i.path.substring(0,i.path.lastIndexOf('/')):'root';
+                f.push({path:i.path,name:name,folder:folder,size:i.size||0,isCode:Parser.isCode(name)});
+            });
+            if(cb)cb('Found '+f.length+' files');
+            return f;
+        });
+    },
+    // Fallback: recursive scan using Contents API (many requests)
+    scanRecursive:function(o,r,cb,p,d){
         var self=this;p=p||'';d=d||0;
         if(d>10)return Promise.resolve([]);
         return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/contents/'+p).then(function(c){
@@ -606,43 +592,20 @@ var GitHub={
             var dirs=c.filter(function(i){return i.type==='dir'&&!IGNORE.has(i.name);});
             c.forEach(function(i){
                 if(i.type==='file'&&Parser.isIncluded(i.name))f.push({path:i.path,name:i.name,folder:i.path.includes('/')?i.path.substring(0,i.path.lastIndexOf('/')):'root',size:i.size,isCode:Parser.isCode(i.name)});
+            else if(i.type==='dir'&&!IGNORE.has(i.name)){if(cb)cb('/'+i.path);promises.push(self.scanRecursive(o,r,cb,i.path,d+1).catch(function(){return[];}));}
             });
-            if(dirs.length===0)return Promise.resolve(f);
-            return new Promise(function(resolve,reject){
-                var results=[];
-                var completed=0;
-                var hasError=false;
-                dirs.forEach(function(dir,idx){
-                    setTimeout(function(){
-                        if(hasError)return;
-                        if(cb)cb('/'+dir.path);
-                        self.scan(o,r,cb,dir.path,d+1).then(function(res){
-                            if(hasError)return;
-                            results.push(res);
-                            completed++;
-                            if(completed===dirs.length){
-                                results.forEach(function(res){f=f.concat(res);});
-                                resolve(f);
-                            }
-                        }).catch(function(e){
-                            if(hasError)return;
-                            if(e.message&&(e.message.includes('403')||e.message.includes('Access denied')||e.message.includes('401'))){
-                                hasError=true;
-                                reject(e);
-                                return;
-                            }
-                            completed++;
-                            if(completed===dirs.length){
-                                results.forEach(function(res){f=f.concat(res);});
-                                resolve(f);
-                            }
-                        });
-                    },idx*50);
-                });
+            return Promise.all(promises).then(function(results){
+                results.forEach(function(res){f=f.concat(res);});
+                return f;
             });
-        }).catch(function(e){
-            if(d===0||(e.message&&(e.message.includes('403')||e.message.includes('Access denied')||e.message.includes('401'))))throw e;
-            return[];
+        }).catch(function(e){if(d===0)throw e;return[];});
+            },
+    // Smart scan: try tree API first (1 request), fallback to recursive
+    scan:function(o,r,cb){
+        var self=this;
+        return this.scanTree(o,r,cb).catch(function(e){
+            if(cb)cb('Tree API failed, using fallback...');
+            return self.scanRecursive(o,r,cb);
         });
     }
 };
@@ -686,15 +649,14 @@ function calcBlast(fileId,conns,files){
             });
         });
         queue=nextQueue;
-        }
         depth++;
     }
     var cnt=affected.size;
     var pct=files.length>0?Math.round(cnt/files.length*100):0;
     var level='low';
     if(pct>40)level='critical';else if(pct>25)level='high';else if(pct>10)level='medium';
-    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:maxDepth
-    };
+    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:maxDepth};
+}
 
 function calcHealth(data){
     if(!data)return{score:0,grade:'F'};
@@ -913,11 +875,37 @@ function App(){
     function analyze(){
         var p=parseUrl(repoUrl);
         if(!p){setError('Invalid URL. Use format: owner/repo');return;}
-        setError(null);setData(null);setSelected(null);setBlastRadius(null);setLoading(true);setProgress('Scanning repository...');setFolderFilter(null);
+        setError(null);setData(null);setSelected(null);setBlastRadius(null);setLoading(true);setProgress('Checking rate limit...');setFolderFilter(null);
         GitHub.token=token||null;
         setRepoInfo(p);
         
-        GitHub.scan(p.owner,p.repo,setProgress).then(function(files){
+        // Check rate limit first
+        GitHub.getRateLimit().then(function(rl){
+            var hasToken=!!GitHub.token;
+            var estimatedRequests=50;// Conservative estimate for a small-medium repo
+
+            // Warn if rate limit is very low and no token
+            if(!hasToken&&rl.remaining<estimatedRequests){
+                var resetTime=new Date(rl.reset*1000).toLocaleTimeString();
+                var proceed=window.confirm(
+                    '⚠️ GitHub API Rate Limit Low\n\n'+
+                    'Remaining requests: '+rl.remaining+'/'+rl.limit+'\n'+
+                    'Resets at: '+resetTime+'\n\n'+
+                    'Without a GitHub token, you only get 60 requests/hour.\n'+
+                    'Adding a token gives you 5000 requests/hour.\n\n'+
+                    'To get a token:\n'+
+                    '1. Go to GitHub Settings → Developer Settings\n'+
+                    '2. Personal access tokens → Tokens (classic)\n'+
+                    '3. Generate new token (no special permissions needed)\n\n'+
+                    'Continue anyway with '+rl.remaining+' requests?'
+                );
+                if(!proceed){setLoading(false);return Promise.reject('cancelled');}
+            }
+
+            setProgress('Scanning repository...');
+            return GitHub.scan(p.owner,p.repo,setProgress);
+        }).then(function(files){
+            if(!files)return;// Cancelled
             if(!files.length)throw new Error('No code files found. The repository may be empty or inaccessible.');
             var SOFT_LIMIT=300,HARD_LIMIT=750;
             if(files.length>SOFT_LIMIT&&files.length<=HARD_LIMIT){
@@ -1015,20 +1003,8 @@ function App(){
             }
             
             processFile(0);
-        }).catch(function(e){
-            var errorMsg=e.message||'Unknown error occurred';
-            if(errorMsg.includes('403')||errorMsg.includes('Access denied')){
-                if(!errorMsg.includes('github.com/settings/tokens')){
-                    errorMsg+=' Learn more: https://github.com/settings/tokens';
-                }
-            }else if(errorMsg.includes('Rate limit')){
-                if(!errorMsg.includes('github.com/settings/tokens')){
-                    errorMsg+=' Learn more: https://github.com/settings/tokens';
-                }
-            }
-            setError(errorMsg);
-            setLoading(false);
-        });
+      
+            }).catch(function(e){if(e!=='cancelled'){setError(e.message||e);setLoading(false);}});
     }
 
     var selectFile=useCallback(function(path){
@@ -2043,7 +2019,8 @@ function App(){
                                 outgoing=Object.values(connByFile.out).sort(function(a,b){return b.fns.length-a.fns.length;});
                                 incoming=Object.values(connByFile.in).sort(function(a,b){return b.fns.length-a.fns.length;});
                                 var totalConns=outgoing.length+incoming.length;
-                                return totalConns>0&&React.createElement('div',{className:'card',style:{marginBottom:12}},
+                                if(totalConns===0)return null;
+                                return React.createElement('div',{className:'card',style:{marginBottom:12}},
                                     React.createElement('div',{className:'card-header',onClick:function(){toggleCard('conns');}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('conns')?' open':'')},'▶'),'🔗 Connections'),React.createElement('span',{className:'badge badge-default'},totalConns)),
                                     expandedCards.has('conns')&&React.createElement('div',{className:'card-body',style:{padding:0}},
                                         outgoing.length>0&&React.createElement(React.Fragment,null,
@@ -2406,10 +2383,9 @@ function App(){
             )
         ),
         toast&&React.createElement('div',{className:'toast '+(toast.type||'success'),'role':'alert'},toast.msg),
-       error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000,maxWidth:350},'role':'alert'},error,React.createElement('button',{'aria-label':'Dismiss error',onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer',fontSize:16}},'×'))
+        error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000,maxWidth:350},'role':'alert'},error,React.createElement('button',{'aria-label':'Dismiss error',onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer',fontSize:16}},'×'))
     );
 }
-
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
