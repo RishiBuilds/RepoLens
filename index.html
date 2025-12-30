@@ -48,7 +48,9 @@
         .top-btn.primary:focus-visible{outline:2px solid var(--acc2); outline-offset:2px}
         .top-btn:disabled{opacity:0.5; cursor:not-allowed; pointer-events: none}
         .main{display:flex; flex:1; min-width: 0; overflow:hidden}
-        .sidebar{width:260px; background:var(--bg1); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink: 0;}
+        .sidebar{width:260px; min-width:180px; max-width:400px; background:var(--bg1); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; position:relative}
+        .resize-handle{position:absolute; top:0; right:-4px; width:8px; height:100%; cursor:col-resize; z-index:10}
+        .resize-handle:hover{background:var(--acc); opacity:0.3}
         .sidebar-section{padding:12px 14px; border-bottom:1px solid var(--border)}
         .sidebar-title{font-size:8px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:10px}
         .sidebar-scroll{flex:1; overflow-y:auto; padding:8px}
@@ -97,7 +99,14 @@
         .tool-btn:hover{background:var(--bg2); color:var(--t0); border-color:var(--acc)}
         .tool-btn:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
         .tool-btn:active{transform: translateX(1px)}
-        .legend{position:absolute; top:12px; right:12px; background:var(--bg1); border:1px solid var(--border); border-radius:8px; padding:12px; z-index:50; min-width:140px; max-height:300px; overflow-y:auto}
+        .legend{position:absolute; top:12px; right:12px; background:var(--bg1); border:1px solid var(--border); border-radius:8px; z-index:50; min-width:140px; max-height:300px; overflow-y:auto; transition:all 0.2s}
+        .legend.collapsed{padding:8px; min-width:auto; max-height:none; overflow:hidden}
+        .legend.collapsed .legend-content{display:none}
+        .legend-header{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; cursor:pointer}
+        .legend-header:hover{background:var(--hover); border-radius:6px}
+        .legend-toggle{font-size:10px; color:var(--t3); transition:transform 0.2s}
+        .legend.collapsed .legend-toggle{transform:rotate(-90deg)}
+        .legend-content{padding:0 12px 12px}
         .legend::-webkit-scrollbar{width:4px}
         .legend::-webkit-scrollbar-thumb{background:var(--border); border-radius:2px}
         .legend-title{font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; margin-bottom:10px}
@@ -105,7 +114,8 @@
         .legend-item:hover{background:var(--hover)}
         .legend-item.active{background:var(--accbg); color:var(--acc)}
         .legend-color{width:12px; height:12px; border-radius:3px; flex-shrink:0}
-        .right-panel{width:360px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+        .right-panel{width:360px; min-width:280px; max-width:500px; background:var(--bg1); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; position:relative}
+        .right-panel .resize-handle{right:auto; left:-4px}
         .panel-tabs{display:flex; border-bottom:1px solid var(--border); background:var(--bg2)}
         .panel-tab{flex:1; padding:8px 10px; border: none; background:transparent; border-bottom:2px solid transparent; color:var(--t3); font-family:inherit; font-size:10px; font-weight:600; cursor:pointer; transition:all 0.2s ease}
         .panel-tab:hover{color:var(--t1)}
@@ -244,6 +254,14 @@
         .view-btn.active{background:var(--accbg); border-color:var(--acc); color:var(--acc)}
         .config-check{display:flex; align-items:center; gap:6px; font-size:10px; color:var(--t2); cursor:pointer}
         .config-check input{accent-color:var(--acc)}
+        .lang-bar{display:flex; height:8px; border-radius:4px; overflow:hidden; margin:8px 0}
+        .lang-bar-segment{height:100%; transition:width 0.3s}
+        .lang-legend{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+        .lang-item{display:flex; align-items:center; gap:4px; font-size:9px; color:var(--t2)}
+        .lang-dot{width:8px; height:8px; border-radius:2px}
+        .loc-stat{text-align:center; padding:8px; background:var(--bg0); border-radius:6px; margin-bottom:8px}
+        .loc-value{font-size:20px; font-weight:700; color:var(--acc)}
+        .loc-label{font-size:9px; color:var(--t3); text-transform:uppercase}
     </style>   
 </head>
 <body>
@@ -634,6 +652,9 @@ function App(){
     var _z=useState(false),showUnused=_z[0],setShowUnused=_z[1];
     var _aa=useState({spacing:200,linkDist:70,viewMode:'force',showLabels:true,curvedLinks:true}),graphConfig=_aa[0],setGraphConfig=_aa[1];
     var _ab=useState(false),showGraphConfig=_ab[0],setShowGraphConfig=_ab[1];
+    var _ac=useState(260),sidebarWidth=_ac[0],setSidebarWidth=_ac[1];
+    var _ad=useState(360),rightPanelWidth=_ad[0],setRightPanelWidth=_ad[1];
+    var _ae=useState(false),legendCollapsed=_ae[0],setLegendCollapsed=_ae[1];
     var svgRef=useRef(null);
     var zoomRef=useRef(null);
     var simRef=useRef(null);
@@ -709,23 +730,27 @@ function App(){
                 var fnNames=[...new Set(allFns.map(function(f){return f.name;}))];
                 var conns=[];
                 var fnStats={};
-                allFns.forEach(function(fn){if(!fnStats[fn.name])fnStats[fn.name]={count:0,callers:new Map(),file:fn.file,folder:fn.folder,line:fn.line,code:fn.code};});
+                allFns.forEach(function(fn){if(!fnStats[fn.name])fnStats[fn.name]={internal:0,external:0,callers:new Map(),file:fn.file,folder:fn.folder,line:fn.line,code:fn.code};});
                 analyzed.forEach(function(file){
                     var calls=Parser.findCalls(file.content,fnNames);
                     Object.entries(calls).forEach(function(entry){
                         var fn=entry[0],cnt=entry[1];
                         var def=fnStats[fn]?fnStats[fn].file:null;
-                        if(def&&def!==file.path){
-                            conns.push({source:def,target:file.path,fn:fn,count:cnt});
-                            var ex=fnStats[fn].callers.get(file.path);
-                            if(ex)ex.count+=cnt;else fnStats[fn].callers.set(file.path,{file:file.path,name:file.name,count:cnt});
-                            fnStats[fn].count+=cnt;
+                        if(def){
+                            if(def===file.path){
+                                fnStats[fn].internal+=cnt;
+                            }else{
+                                conns.push({source:def,target:file.path,fn:fn,count:cnt});
+                                var ex=fnStats[fn].callers.get(file.path);
+                                if(ex)ex.count+=cnt;else fnStats[fn].callers.set(file.path,{file:file.path,name:file.name,count:cnt});
+                                fnStats[fn].external+=cnt;
+                            }
                         }
                     });
                 });
-                Object.values(fnStats).forEach(function(s){s.callers=Array.from(s.callers.values());});
+                Object.values(fnStats).forEach(function(s){s.callers=Array.from(s.callers.values());s.count=s.internal+s.external;});
                 var issues=[];
-                var deadFns=Object.entries(fnStats).filter(function(x){return x[1].count===0;});
+                var deadFns=Object.entries(fnStats).filter(function(x){return x[1].internal===0&&x[1].external===0;});
                 if(deadFns.length)issues.push({type:'warning',title:deadFns.length+' Unused Functions',desc:'Functions not called from other files',items:deadFns.slice(0,10).map(function(x){return{name:x[0],file:x[1].file};})});
                 var godFiles=analyzed.filter(function(f){return f.functions.length>15;});
                 if(godFiles.length)issues.push({type:'critical',title:godFiles.length+' Large Files',desc:'Files with 15+ functions',items:godFiles.slice(0,5).map(function(f){return{name:f.name+' ('+f.functions.length+' fns)',file:f.path};})});
@@ -741,7 +766,11 @@ function App(){
                 var securityIssues=Parser.detectSecurity(analyzed);
                 var folders=[...new Set(analyzed.map(function(f){return f.folder;}))].sort();
                 var tree=buildTree(analyzed);
-                setData({files:analyzed,functions:allFns,connections:conns,fnStats:fnStats,folders:folders,tree:tree,issues:issues,patterns:patterns,securityIssues:securityIssues,deadFunctions:deadFns.map(function(x){return{name:x[0],file:x[1].file,folder:x[1].folder,line:x[1].line,code:x[1].code};}),stats:{files:analyzed.length,functions:allFns.length,connections:conns.length,dead:deadFns.length,patterns:patterns.length,security:securityIssues.filter(function(i){return i.severity==='high';}).length}});
+                var totalLoc=analyzed.reduce(function(s,f){return s+f.lines;},0);
+                var langStats={};
+                analyzed.forEach(function(f){var ext=f.name.split('.').pop().toLowerCase();langStats[ext]=(langStats[ext]||0)+f.lines;});
+                var langArray=Object.entries(langStats).sort(function(a,b){return b[1]-a[1];}).map(function(e){return{ext:e[0],lines:e[1],pct:Math.round(e[1]/totalLoc*100)};});
+                setData({files:analyzed,functions:allFns,connections:conns,fnStats:fnStats,folders:folders,tree:tree,issues:issues,patterns:patterns,securityIssues:securityIssues,deadFunctions:deadFns.map(function(x){return{name:x[0],file:x[1].file,folder:x[1].folder,line:x[1].line,code:x[1].code};}),stats:{files:analyzed.length,functions:allFns.length,connections:conns.length,dead:deadFns.length,patterns:patterns.length,security:securityIssues.filter(function(i){return i.severity==='high';}).length,loc:totalLoc,languages:langArray}});
                 setExpandedPaths(new Set(['']));
                 var newUrl=window.location.pathname+'?repo='+encodeURIComponent(p.owner+'/'+p.repo);
                 window.history.replaceState({},'',newUrl);
@@ -882,6 +911,35 @@ function App(){
                .force('collision',d3.forceCollide().radius(function(d){return getR(d)+10;}))
                .force('x',d3.forceX(function(d){return d.targetX||w/2;}).strength(0.9))
                .force('y',d3.forceY(function(d){return d.targetY||h/2;}).strength(0.3));
+               }else if(graphConfig.viewMode==='grid'){
+            var gridCols=Math.ceil(Math.sqrt(nodes.length));
+            var cellW=w/(gridCols+1);
+            var cellH=h/(Math.ceil(nodes.length/gridCols)+1);
+            nodes.forEach(function(n,i){n.targetX=(i%gridCols+1)*cellW;n.targetY=(Math.floor(i/gridCols)+1)*cellH;});
+            sim.force('link',d3.forceLink(links).id(function(d){return d.id;}).distance(graphConfig.linkDist*1.5).strength(0.02))
+               .force('collision',d3.forceCollide().radius(function(d){return getR(d)+15;}))
+               .force('x',d3.forceX(function(d){return d.targetX;}).strength(1))
+               .force('y',d3.forceY(function(d){return d.targetY;}).strength(1));
+        }else if(graphConfig.viewMode==='metro'){
+            var metro={lines:[],stations:{}};
+            var roots=nodes.filter(function(n){return!links.some(function(l){return(l.target.id||l.target)===n.id;});});
+            if(!roots.length)roots=[nodes[0]];
+            var lineY=80,lineSpacing=Math.min(120,(h-160)/Math.max(1,roots.length));
+            roots.forEach(function(root,li){
+                var visited=new Set(),queue=[root.id],line=[],x=80;
+                while(queue.length){
+                    var id=queue.shift();if(visited.has(id))continue;visited.add(id);
+                    var node=nodes.find(function(n){return n.id===id;});
+                    if(node){node.targetX=x;node.targetY=lineY+li*lineSpacing;node.metroLine=li;line.push(node);x+=graphConfig.spacing*0.8;}
+                    links.forEach(function(l){var s=l.source.id||l.source,t=l.target.id||l.target;if(s===id&&!visited.has(t))queue.push(t);});
+                }
+                metro.lines.push(line);
+            });
+            nodes.filter(function(n){return!n.targetX;}).forEach(function(n,i){n.targetX=80+i*50;n.targetY=h-80;n.metroLine=roots.length;});
+            sim.force('link',d3.forceLink(links).id(function(d){return d.id;}).distance(graphConfig.linkDist).strength(0.05))
+               .force('collision',d3.forceCollide().radius(function(d){return getR(d)+12;}))
+               .force('x',d3.forceX(function(d){return d.targetX||w/2;}).strength(0.95))
+               .force('y',d3.forceY(function(d){return d.targetY||h/2;}).strength(0.95));
         }
         sim.velocityDecay(0.6).alphaDecay(0.05);
         simRef.current=sim;
@@ -970,7 +1028,14 @@ function App(){
             )
         ),
         React.createElement('div',{className:'main'},
-            React.createElement('div',{className:'sidebar'},
+            React.createElement('div',{className:'sidebar',style:{width:sidebarWidth}},
+                React.createElement('div',{className:'resize-handle',onMouseDown:function(e){
+                    e.preventDefault();
+                    var startX=e.clientX,startW=sidebarWidth;
+                    function onMove(e){setSidebarWidth(Math.max(180,Math.min(400,startW+e.clientX-startX)));}
+                    function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);}
+                    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+                }}),
                 data?React.createElement(React.Fragment,null,
                     React.createElement('div',{className:'sidebar-section'},
                         React.createElement('div',{className:'health-score'},
@@ -996,6 +1061,21 @@ function App(){
                             React.createElement('div',{className:'stat-card'},React.createElement('div',{className:'stat-value'},data.stats.connections),React.createElement('div',{className:'stat-label'},'Links')),
                              React.createElement('div',{className:'stat-card'+(data.stats.dead>10?' warn':''),style:{cursor:data.stats.dead>0?'pointer':'default'},onClick:function(){if(data.stats.dead>0)setShowUnused(true);}},React.createElement('div',{className:'stat-value'},data.stats.dead),React.createElement('div',{className:'stat-label'},'Unused'))
                         )
+                        ),
+                        React.createElement('div',{className:'loc-stat'},
+                            React.createElement('div',{className:'loc-value'},data.stats.loc?data.stats.loc.toLocaleString():'0'),
+                            React.createElement('div',{className:'loc-label'},'Lines of Code')
+                        ),
+                        data.stats.languages&&data.stats.languages.length>0&&React.createElement(React.Fragment,null,
+                            React.createElement('div',{className:'lang-bar'},
+                                data.stats.languages.slice(0,6).map(function(l,i){return React.createElement('div',{key:l.ext,className:'lang-bar-segment',style:{width:l.pct+'%',background:COLORS[i%COLORS.length]}});})
+                            ),
+                            React.createElement('div',{className:'lang-legend'},
+                                data.stats.languages.slice(0,6).map(function(l,i){return React.createElement('div',{key:l.ext,className:'lang-item'},
+                                    React.createElement('div',{className:'lang-dot',style:{background:COLORS[i%COLORS.length]}}),
+                                    React.createElement('span',null,l.ext,' ',l.pct,'%')
+                                );})
+                            )
                     ),
                     React.createElement('div',{className:'sidebar-section',style:{paddingBottom:8}},
                         React.createElement('div',{className:'sidebar-title'},'Explorer'),
@@ -1018,10 +1098,12 @@ function App(){
                     ),
                     showGraphConfig&&React.createElement('div',{className:'graph-config'},
                         React.createElement('div',{className:'graph-config-title'},'Layout'),
-                        React.createElement('div',{className:'view-toggle'},
+                        React.createElement('div',{className:'view-toggle',style:{flexWrap:'wrap'}},
                             React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='force'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'force'}));}},'Force'),
                             React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='radial'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'radial'}));}},'Radial'),
-                            React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='hierarchical'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'hierarchical'}));}},'Layers')
+                            React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='hierarchical'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'hierarchical'}));}},'Layers'),
+                            React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='grid'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'grid'}));}},'Grid'),
+                            React.createElement('button',{className:'view-btn'+(graphConfig.viewMode==='metro'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{viewMode:'metro'}));}},'Metro')
                         ),
                         React.createElement('div',{className:'graph-config-title',style:{marginTop:8}},'Spacing'),
                         React.createElement('div',{className:'config-row'},
@@ -1049,17 +1131,29 @@ function App(){
                         React.createElement('div',{className:'info-chip'},React.createElement('strong',null,data.connections.length),' links'),
                         selected&&blastRadius&&React.createElement('div',{className:'info-chip'},'💥 ',React.createElement('strong',null,blastRadius.count),' affected')
                     ),
-                    React.createElement('div',{className:'legend'},
-                        React.createElement('div',{className:'legend-title'},colorMode==='folder'?'Folders':colorMode==='layer'?'Layers':'Churn'),
-                        colorMode==='folder'&&data.folders.slice(0,12).map(function(f,i){return React.createElement('div',{key:f,className:'legend-item'+(folderFilter===f?' active':''),onClick:function(){filterByFolder(f);}},React.createElement('div',{className:'legend-color',style:{background:colorMap[f]||COLORS[i%COLORS.length]}}),f||'root');}),
-                        colorMode==='folder'&&data.folders.length>12&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginTop:4}},'+',data.folders.length-12,' more'),
-                        colorMode==='layer'&&Object.entries(LAYER_COLORS).map(function(e){return React.createElement('div',{key:e[0],className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:e[1]}}),e[0]);}),
-                        colorMode==='churn'&&React.createElement(React.Fragment,null,React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff5f5f'}}),'High (7+ commits)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff9f43'}}),'Medium (4-6)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#22c55e'}}),'Low (0-3)'))
+                    React.createElement('div',{className:'legend'+(legendCollapsed?' collapsed':'')},
+                        React.createElement('div',{className:'legend-header',onClick:function(){setLegendCollapsed(!legendCollapsed);}},
+                            React.createElement('div',{className:'legend-title',style:{margin:0}},colorMode==='folder'?'Folders':colorMode==='layer'?'Layers':'Churn'),
+                            React.createElement('span',{className:'legend-toggle'},'▼')
+                        ),
+                        React.createElement('div',{className:'legend-content'},
+                            colorMode==='folder'&&data.folders.slice(0,12).map(function(f,i){return React.createElement('div',{key:f,className:'legend-item'+(folderFilter===f?' active':''),onClick:function(){filterByFolder(f);}},React.createElement('div',{className:'legend-color',style:{background:colorMap[f]||COLORS[i%COLORS.length]}}),f||'root');}),
+                            colorMode==='folder'&&data.folders.length>12&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginTop:4}},'+',data.folders.length-12,' more'),
+                            colorMode==='layer'&&Object.entries(LAYER_COLORS).map(function(e){return React.createElement('div',{key:e[0],className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:e[1]}}),e[0]);}),
+                            colorMode==='churn'&&React.createElement(React.Fragment,null,React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff5f5f'}}),'High (7+ commits)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff9f43'}}),'Medium (4-6)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#22c55e'}}),'Low (0-3)'))
+                        )
                     ),
                     tooltip&&React.createElement('div',{className:'tooltip',style:{left:tooltip.x,top:tooltip.y}},React.createElement('div',{className:'tooltip-title'},tooltip.title),React.createElement('div',{className:'tooltip-content'},tooltip.content))
                 )
             ),
-            React.createElement('div',{className:'right-panel'},
+            React.createElement('div',{className:'right-panel',style:{width:rightPanelWidth}},
+                React.createElement('div',{className:'resize-handle',onMouseDown:function(e){
+                    e.preventDefault();
+                    var startX=e.clientX,startW=rightPanelWidth;
+                    function onMove(e){setRightPanelWidth(Math.max(280,Math.min(500,startW-(e.clientX-startX))));}
+                    function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);}
+                    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+                }}),
                 data?React.createElement(React.Fragment,null,
                     React.createElement('div',{className:'panel-tabs'},
                         React.createElement('button',{className:'panel-tab'+(rightTab==='details'?' active':''),onClick:function(){setRightTab('details');}},selected?'📄 FILE':'🔍 ISSUES'),
@@ -1096,18 +1190,20 @@ function App(){
                                     selected.functions.map(function(fn){
                                         var st=data.fnStats[fn.name];
                                         var isExpanded=expandedFns.has(fn.name);
+                                         var intCalls=st?st.internal:0,extCalls=st?st.external:0;
                                         return React.createElement('div',{key:fn.name,className:'fn-item'},
                                             React.createElement('div',{className:'fn-header',onClick:function(){toggleFn(fn.name);}},
                                                 React.createElement('span',{className:'fn-name'},fn.name,'()'),
-                                                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:6}},
+                                                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:4}},
                                                     React.createElement('span',{className:'fn-line'},'L',fn.line),
-                                                    React.createElement('span',{className:'badge '+(st&&st.count>10?'badge-danger':st&&st.count>0?'badge-warning':'badge-default')},st?st.count:0,' calls')
+                                                    React.createElement('span',{className:'badge badge-default',title:'Internal calls (same file)'},intCalls,' int'),
+                                                    React.createElement('span',{className:'badge '+(extCalls>10?'badge-danger':extCalls>0?'badge-warning':'badge-default'),title:'External calls (other files)'},extCalls,' ext')
                                                 )
                                             ),
                                             isExpanded&&React.createElement(React.Fragment,null,
                                                 fn.code&&React.createElement('div',{className:'fn-code'},fn.code),
                                                 st&&st.callers&&st.callers.length>0&&React.createElement('div',{className:'fn-callers'},
-                                                    React.createElement('div',{className:'fn-callers-title'},'Called from:'),
+                                                    React.createElement('div',{className:'fn-callers-title'},'External callers:'),
                                                     st.callers.slice(0,8).map(function(c,i){return React.createElement('div',{key:i,className:'fn-caller',onClick:function(){selectFile(c.file);}},
                                                         React.createElement('span',null,'📄'),
                                                         React.createElement('span',null,c.name),
@@ -1115,7 +1211,7 @@ function App(){
                                                     );}),
                                                     st.callers.length>8&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',padding:'4px 6px'}},'+',st.callers.length-8,' more')
                                                 ),
-                                                (!st||!st.callers||st.callers.length===0)&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',padding:8,textAlign:'center'}},'No callers detected')
+                                                intCalls===0&&extCalls===0&&React.createElement('div',{style:{fontSize:9,color:'var(--orange)',padding:8,textAlign:'center',background:'rgba(255,159,67,0.1)',borderRadius:4}},'⚠️ This function is never called')
                                             )
                                         );
                                     })
@@ -1245,7 +1341,7 @@ function App(){
                         return React.createElement('div',{key:i,className:'fn-item'},
                             React.createElement('div',{className:'fn-header',onClick:function(){toggleFn('dead-'+fn.name);}},
                                 React.createElement('span',{className:'fn-name'},fn.name,'()'),
-                                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:6}},
+                                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:4}},
                                     fn.line&&React.createElement('span',{className:'fn-line'},'L',fn.line),
                                     React.createElement('span',{className:'badge badge-default',style:{cursor:'pointer'},onClick:function(e){e.stopPropagation();selectFile(fn.file);setShowUnused(false);}},fn.file.split('/').pop())
                                 )
