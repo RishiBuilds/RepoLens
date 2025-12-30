@@ -17,6 +17,8 @@
 
 [Quick Start](#-quick-start) • [Features](#-key-features) • [Usage](#-usage) • [Privacy](#-privacy-first)
 
+</div>
+
 ---
 
 ## Table of Contents
