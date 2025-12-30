@@ -1561,11 +1561,7 @@ function App(){
             var blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
             var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-report.json';a.click();URL.revokeObjectURL(url);
         }else if(format==='md'){
-<<<<<<< HEAD
             var md='# RepoLens IQ Analysis Report\n\n';
-=======
-            var md='# CodeFlow Analysis Report\n\n';
->>>>>>> 519cc1755a2388423ae868c57d68b5c304ef2293
             md+='**Repository:** '+repo+'\n';
             md+='**Analyzed:** '+new Date().toLocaleString()+'\n\n';
             md+='## Summary\n\n';
@@ -1633,15 +1629,9 @@ function App(){
             });
             if(data.files.length>100)md+='\n*...and '+(data.files.length-100)+' more files*\n';
             var blob=new Blob([md],{type:'text/markdown'});
-<<<<<<< HEAD
             var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-report.md';a.click();URL.revokeObjectURL(url);
         }else if(format==='txt'){
             var txt='REPOLENS IQ ANALYSIS REPORT\n';
-=======
-            var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='codeflow-report.md';a.click();URL.revokeObjectURL(url);
-        }else if(format==='txt'){
-            var txt='CODEFLOW ANALYSIS REPORT\n';
->>>>>>> 519cc1755a2388423ae868c57d68b5c304ef2293
             txt+='========================\n\n';
             txt+='Repository: '+repo+'\n';
             txt+='Analyzed: '+new Date().toLocaleString()+'\n\n';
@@ -1703,11 +1693,8 @@ function App(){
             });
             if(data.connections.length>100)txt+='\n...and '+(data.connections.length-100)+' more dependencies\n';
             var blob=new Blob([txt],{type:'text/plain'});
-<<<<<<< HEAD
             var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-report.txt';a.click();URL.revokeObjectURL(url);
-=======
-            var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='codeflow-report.txt';a.click();URL.revokeObjectURL(url);
->>>>>>> 519cc1755a2388423ae868c57d68b5c304ef2293
+
         }
         showNotification('Report exported as '+format.toUpperCase(),'success');
     }
