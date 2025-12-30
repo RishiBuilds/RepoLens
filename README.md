@@ -106,8 +106,6 @@ RepoLens IQ is built with **strict privacy principles** from the ground up.
 - ✅ Tokens are cleared when you close the tab
 - ✅ Works with both public and private repositories
 
-**Your code never leaves your machine. Ever.**
-
 ---
 
 
