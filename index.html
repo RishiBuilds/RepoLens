@@ -97,11 +97,15 @@
         .tool-btn:hover{background:var(--bg2); color:var(--t0); border-color:var(--acc)}
         .tool-btn:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
         .tool-btn:active{transform: translateX(1px)}
-        .legend{position:absolute; top:12px; right:12px; background:var(--bg1); border:1px solid var(--border); border-radius:8px; padding:12px 14px; z-index:50; min-width: 140px;}
+        .legend{position:absolute; top:12px; right:12px; background:var(--bg1); border:1px solid var(--border); border-radius:8px; padding:12px; z-index:50; min-width:140px; max-height:300px; overflow-y:auto}
+        .legend::-webkit-scrollbar{width:4px}
+        .legend::-webkit-scrollbar-thumb{background:var(--border); border-radius:2px}
         .legend-title{font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; margin-bottom:10px}
-        .legend-item{display:flex; align-items:center; gap:8px; font-size:10px; background:var(--t2); margin-bottom:6px}
-        .legend-color{width:12px; height:12px; border-radius:3px; flex-shrink:0; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset}
-        .right-panel{width:340px; background:var(--bg1); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0}
+        .legend-item{display:flex; align-items:center; gap:8px; font-size:10px; color:var(--t2); margin-bottom:4px; cursor:pointer; padding:2px 4px; border-radius:4px}
+        .legend-item:hover{background:var(--hover)}
+        .legend-item.active{background:var(--accbg); color:var(--acc)}
+        .legend-color{width:12px; height:12px; border-radius:3px; flex-shrink:0}
+        .right-panel{width:360px;background:var(--bg1);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
         .panel-tabs{display:flex; border-bottom:1px solid var(--border); background:var(--bg2)}
         .panel-tab{flex:1; padding:8px 10px; border: none; background:transparent; border-bottom:2px solid transparent; color:var(--t3); font-family:inherit; font-size:10px; font-weight:600; cursor:pointer; transition:all 0.2s ease}
         .panel-tab:hover{color:var(--t1)}
@@ -124,6 +128,7 @@
         .badge-success{background:rgba(34,197,94,0.2); color:var(--green)}
         .badge-warning{background:rgba(255,159,67,0.2); color:var(--orange)}
         .badge-danger{background:rgba(255,95,95,0.2); color:var(--red)}
+        .badge-info{background:rgba(77,159,255,0.2); color:var(--blue)}
         .progress-bar{height:5px; background:var(--bg3); border-radius:4px; overflow:hidden}
         .progress-fill{height:100%; border-radius:4px}
         .owner-bar{display:flex; height:8px; border-radius:4px; overflow:hidden; margin:8px 0}
@@ -133,28 +138,39 @@
         .owner-avatar{width:20px; height:20px; border-radius:50%; display:flex; display:inline-flex; align-items:center; justify-content:center; font-size:9px; color:#ffffff}
         .owner-name{flex:1; min-width: 0; color:var(--t1); overflow: hidden}
         .owner-percent{color:var(--t3); font-variant-numeric: tabular-nums}
-        .layer-row{display:flex; align-items:center; gap:9px; padding:10px 13px; background:var(--bg1); border-radius:7px; border-left:3px solid var(--acc); margin-bottom:7px}
-        .layer-name{flex:1; font-size:12px; font-weight:600}
-        .layer-count{font-size:10px; color:var(--t3); font-weight: 600}
-        .pattern-item{display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--bg1); border-radius:7px;margin-bottom:6px; border-left:3px solid var(--green)}
+        .pattern-item{padding:12px; background:var(--bg0); border-radius:8px; margin-bottom:8px; border-left:3px solid var(--green)}
         .pattern-item.anti{border-color:var(--red)}
-        .pattern-icon{font-size:16px; line-height:1}
-        .pattern-info{flex:1; min-width: 0}
-        .pattern-name{font-size:11px; color:var(--t0); font-weight:500}
-        .pattern-desc{font-size:9px; color:var(--t3); margin-top:2px}
-        .pattern-files{font-size:9px; color:var(--t2); margin-top:5px}
-        .security-item{padding:10px 12px; background:var(--bg1); border-radius:7px; margin-bottom:7px; border-left:3px solid; cursor:pointer; transition:all 0.2s ease}
+        .pattern-header{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+        .pattern-icon{font-size:20px}
+        .pattern-name{font-size:12px; color:var(--t0); font-weight:600}
+        .pattern-desc{font-size:10px; color:var(--t2); margin-bottom:8px; line-height:1.4}
+        .pattern-files{font-size:9px; color:var(--t3)}
+        .pattern-file{display:inline-block; background:var(--bg3); padding:2px 6px; border-radius:4px; margin:2px}
+        .pattern-metrics{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border2)}
+        .pattern-metric{text-align:center}
+        .pattern-metric-value{font-size:14px; font-weight:600; color:var(--acc)}
+        .pattern-metric-label{font-size:8px; color:var(--t3); text-transform:uppercase}
+        .security-item{padding:12px; background:var(--bg0); border-radius:8px; margin-bottom:8px; border-left:3px solid; cursor:pointer}
         .security-item:hover{background:var(--hover)}
         .security-item:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .security-item.high{border-color:var(--red)}
         .security-item.medium{border-color:var(--orange)}
         .security-item.low{border-color:var(--blue)}
-        .security-title{font-size:12px; color:var(--t0)}
-        .security-path{font-size:10px; color:var(--t3); margin-top:4px}
-        .tour-step{display:flex; gap:12px; padding:12px; background:var(--bg1); border-radius:8px; margin-bottom:8px}
-        .tour-number{width:24px; height:24px; background:var(--acc); color:#030305; border-radius:50%; display:flex; display: inline-flex;align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0}
-        .tour-content{flex:1}
-        .tour-file{font-size:12px; color:var(--acc); cursor:pointer}
+        .security-header{display:flex; align-items:center; gap:8px; margin-bottom:6px}
+        .security-title{font-size:11px; color:var(--t0); font-weight:500}
+        .security-desc{font-size:10px; color:var(--t2); margin-bottom:6px; line-height:1.4}
+        .security-path{font-size:9px; color:var(--t3); font-family:monospace}
+        .security-line{font-size:9px; color:var(--acc); margin-top:4px}
+        .security-code{font-size:9px; background:var(--bg3); padding:6px 8px; border-radius:4px; margin-top:6px; font-family:monospace; color:var(--orange); overflow-x:auto; white-space:pre}
+        .fn-item{background:var(--bg0); border-radius:6px; margin-bottom:6px; overflow:hidden}
+        .fn-header{display:flex; align-items:center; justify-content:space-between; padding:8px 10px; cursor:pointer}
+        .fn-header:hover{background:var(--hover)}
+        .fn-name{color:var(--cyan); font-size:10px; font-family:monospace}
+        .fn-line{font-size:9px; color:var(--t3)}
+        .fn-code{font-size:9px; background:var(--bg3); padding:8px; font-family:monospace; color:var(--t1); overflow-x:auto; white-space:pre; max-height:150px; overflow-y:auto; border-top:1px solid var(--border2)}
+        .blast-detail{margin-top:8px; padding-top:8px; border-top:1px solid var(--border2)}
+        .blast-file{display:flex; align-items:center; gap:6px; font-size:9px; color:var(--t2); padding:3px 0}
+        .blast-file:hover{color:var(--acc); cursor:pointer}
         .modal-overlay{position:fixed; inset:0; background:rgba(5, 5, 7, 0.85); backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000}
         .modal{background:var(--bg1); border:1px solid var(--border2); border-radius:12px; width:90%; max-width:520px; max-height:80vh; overflow:hidden; display:flex; flex-direction:column}
         .modal-header{padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between}
@@ -206,6 +222,11 @@
         .reset-btn:hover{border-color:var(--red); color:var(--red)}
         .loading-owner{display:flex; align-items:center; gap:8px; padding:12px;color:var(--t2); font-size:10px}
         .loading-owner::before{content:''; width:14px; height:14px; border:2px solid var(--border2); border-top-color:var(--acc); border-radius:50%; animation:spin 0.6s linear infinite}
+        .privacy-modal{max-width:450px}
+        .privacy-item{display:flex; align-items:flex-start; gap:10px; padding:10px; background:var(--bg0); border-radius:8px; margin-bottom:8px}
+        .privacy-icon{font-size:20px; flex-shrink:0}
+        .privacy-text{font-size:11px; color:var(--t1); line-height:1.5}
+        .privacy-title{font-weight:600; color:var(--t0); margin-bottom:4px}
     </style>   
 </head>
 <body>
@@ -231,32 +252,63 @@ const Parser={
     },
     detectPatterns:function(files){
         var patterns=[];
-        var singletons=files.filter(function(f){return f.content&&(f.content.includes('getInstance')||f.content.match(/let\s+instance\s*=/));});
-        if(singletons.length)patterns.push({name:'Singleton',icon:'🔒',desc:'Single instance pattern',files:singletons.map(function(f){return f.name;})});
-        var factories=files.filter(function(f){return f.content&&(f.name.toLowerCase().includes('factory')||f.content.includes('create')&&f.content.includes('return new'));});
-        if(factories.length)patterns.push({name:'Factory',icon:'🏭',desc:'Object creation abstraction',files:factories.map(function(f){return f.name;})});
-        var observers=files.filter(function(f){return f.content&&(f.content.includes('subscribe')||f.content.includes('addEventListener')||f.content.includes('emit('));});
-        if(observers.length)patterns.push({name:'Observer',icon:'👁️',desc:'Event-based communication',files:observers.map(function(f){return f.name;})});
-        var hooks=files.filter(function(f){return f.content&&f.content.match(/use[A-Z][a-zA-Z]+\s*=/);});
-        if(hooks.length)patterns.push({name:'Custom Hooks',icon:'🪝',desc:'React hook pattern',files:hooks.map(function(f){return f.name;})});
-        var godFiles=files.filter(function(f){return f.functions&&f.functions.length>20;});
-        if(godFiles.length)patterns.push({name:'God Object',icon:'⚠️',desc:'Too many responsibilities',files:godFiles.map(function(f){return f.name;}),isAnti:true});
+        var singletons=files.filter(function(f){return f.content&&(f.content.includes('getInstance')||f.content.match(/let\s+instance\s*=/)||f.content.match(/private\s+static\s+instance/));});
+        if(singletons.length)patterns.push({name:'Singleton',icon:'🔒',desc:'Ensures a class has only one instance. Common for configuration, logging, or connection pools.',severity:'info',files:singletons.map(function(f){return{name:f.name,path:f.path};}),metrics:{instances:singletons.length}});
+        var factories=files.filter(function(f){return f.content&&(f.name.toLowerCase().includes('factory')||f.content.match(/create[A-Z]\w*\s*\(/)||f.content.includes('return new'));});
+        if(factories.length)patterns.push({name:'Factory',icon:'🏭',desc:'Creates objects without specifying exact class. Enables loose coupling and extensibility.',severity:'info',files:factories.map(function(f){return{name:f.name,path:f.path};}),metrics:{factories:factories.length}});
+        var observers=files.filter(function(f){return f.content&&(f.content.includes('subscribe')||f.content.includes('addEventListener')||f.content.includes('.on(')||f.content.includes('emit('));});
+        if(observers.length)patterns.push({name:'Observer/Event',icon:'👁️',desc:'Defines a subscription mechanism for event-driven architecture. Great for decoupling.',severity:'info',files:observers.map(function(f){return{name:f.name,path:f.path};}),metrics:{emitters:observers.length}});
+        var hooks=files.filter(function(f){return f.content&&f.content.match(/export\s+(?:const|function)\s+use[A-Z]/);});
+        if(hooks.length)patterns.push({name:'Custom Hooks',icon:'🪝',desc:'React hooks for reusable stateful logic. Promotes code reuse and separation of concerns.',severity:'info',files:hooks.map(function(f){return{name:f.name,path:f.path};}),metrics:{hooks:hooks.length}});
+        var hocs=files.filter(function(f){return f.content&&(f.content.match(/with[A-Z]\w*\s*=\s*\(/)||f.content.match(/export\s+default\s+connect/));});
+        if(hocs.length)patterns.push({name:'Higher-Order Component',icon:'🎁',desc:'Functions that take a component and return an enhanced component.',severity:'info',files:hocs.map(function(f){return{name:f.name,path:f.path};}),metrics:{hocs:hocs.length}});
+        var providers=files.filter(function(f){return f.content&&(f.content.includes('createContext')||f.content.includes('Provider')||f.content.includes('useContext'));});
+        if(providers.length)patterns.push({name:'Context Provider',icon:'🌐',desc:'React Context for global state. Alternative to prop drilling.',severity:'info',files:providers.map(function(f){return{name:f.name,path:f.path};}),metrics:{contexts:providers.length}});
+        var godFiles=files.filter(function(f){return f.functions&&f.functions.length>15;});
+        if(godFiles.length)patterns.push({name:'God Object',icon:'⚠️',desc:'Files with too many responsibilities (15+ functions). Consider splitting into smaller modules.',severity:'warning',isAnti:true,files:godFiles.map(function(f){return{name:f.name,path:f.path,fns:f.functions.length};}),metrics:{files:godFiles.length,avgFns:Math.round(godFiles.reduce(function(s,f){return s+f.functions.length;},0)/godFiles.length)}});
+        var longFiles=files.filter(function(f){return f.lines&&f.lines>500;});
+        if(longFiles.length)patterns.push({name:'Long File',icon:'📜',desc:'Files over 500 lines are harder to maintain. Consider breaking into smaller modules.',severity:'warning',isAnti:true,files:longFiles.map(function(f){return{name:f.name,path:f.path,lines:f.lines};}),metrics:{files:longFiles.length,avgLines:Math.round(longFiles.reduce(function(s,f){return s+f.lines;},0)/longFiles.length)}});
         return patterns;
     },
     detectSecurity:function(files){
         var issues=[];
         files.forEach(function(f){
             if(!f.content)return;
-            if(f.content.match(/password\s*=\s*['"][^'"]+['"]/i)||f.content.match(/api_key\s*=\s*['"][^'"]+['"]/i))
-                issues.push({severity:'high',title:'Hardcoded secret',file:f.name,path:f.path,desc:'Potential credentials in code'});
-            if(f.content.match(/query\s*\(\s*['"`].*\+/)||f.content.match(/execute\s*\(\s*['"`].*\$\{/))
-                issues.push({severity:'high',title:'SQL Injection risk',file:f.name,path:f.path,desc:'String concatenation in query'});
-            if(f.content.includes('eval(')||f.content.includes('Function('))
-                issues.push({severity:'medium',title:'Dynamic code execution',file:f.name,path:f.path,desc:'eval() or Function() detected'});
-            if(f.content.match(/console\.(log|debug)\(/))
-                issues.push({severity:'low',title:'Debug statements',file:f.name,path:f.path,desc:'Console statements in code'});
+            var lines=f.content.split('\n');
+            lines.forEach(function(line,idx){
+                if(line.match(/(?:password|passwd|pwd|secret|api_key|apikey|token|auth)\s*[=:]\s*['"][^'"]{4,}['"]/i)&&!line.includes('process.env')&&!line.includes('config.')){
+                    issues.push({severity:'high',title:'Hardcoded Secret',file:f.name,path:f.path,line:idx+1,desc:'Credentials should never be hardcoded. Use environment variables or a secrets manager.',code:line.trim().substring(0,80)});
+                }
+            });
+            if(f.content.match(/query\s*\(\s*['"`][^'"`]*\s*\+/)||f.content.match(/execute\s*\(\s*['"`][^'"`]*\$\{/)||f.content.match(/\$\{.*\}.*(?:SELECT|INSERT|UPDATE|DELETE)/i)){
+                var m=f.content.match(/.*(query|execute|SELECT|INSERT|UPDATE|DELETE).*(\+|\$\{).*/i);
+                issues.push({severity:'high',title:'SQL Injection Risk',file:f.name,path:f.path,desc:'String concatenation in SQL queries. Use parameterized queries instead.',code:m?m[0].trim().substring(0,80):''});
+            }
+            if(f.content.match(/innerHTML\s*=/)||f.content.match(/dangerouslySetInnerHTML/)){
+                issues.push({severity:'high',title:'XSS Vulnerability',file:f.name,path:f.path,desc:'Direct HTML injection can lead to XSS attacks. Sanitize user input.',code:''});
+            }
+            if(f.content.includes('eval(')){
+                var evalLine=lines.findIndex(function(l){return l.includes('eval(');});
+                issues.push({severity:'medium',title:'Dynamic Code Execution',file:f.name,path:f.path,line:evalLine+1,desc:'eval() executes arbitrary code. Avoid if possible or validate input strictly.',code:evalLine>=0?lines[evalLine].trim().substring(0,80):''});
+            }
+            if(f.content.includes('Function(')||f.content.match(/new\s+Function\s*\(/)){
+                issues.push({severity:'medium',title:'Function Constructor',file:f.name,path:f.path,desc:'Function constructor is similar to eval(). Consider alternatives.',code:''});
+            }
+            if(f.content.match(/\.exec\s*\(/)||f.content.match(/child_process/)){
+                issues.push({severity:'medium',title:'Command Execution',file:f.name,path:f.path,desc:'Shell command execution detected. Ensure input is sanitized to prevent injection.',code:''});
+            }
+            if(f.content.match(/console\.(log|debug|info)\(/)){
+                var consoleCount=(f.content.match(/console\.(log|debug|info)\(/g)||[]).length;
+                if(consoleCount>3){
+                    issues.push({severity:'low',title:'Debug Statements',file:f.name,path:f.path,desc:consoleCount+' console statements found. Remove before production.',code:''});
+                }
+            }
+            if(f.content.match(/TODO|FIXME|HACK|XXX/)){
+                var todoCount=(f.content.match(/TODO|FIXME|HACK|XXX/g)||[]).length;
+                issues.push({severity:'low',title:'Code Comments',file:f.name,path:f.path,desc:todoCount+' TODO/FIXME comments found. Address before release.',code:''});
+            }
         });
-        return issues;
+        return issues.sort(function(a,b){var sev={high:0,medium:1,low:2};return sev[a.severity]-sev[b.severity];});
     },
     extract:function(content,filename){
         var fns=new Map();
@@ -265,11 +317,11 @@ const Parser={
         function add(name,line){
             if(name&&name.length>1&&!skip.has(name)&&!fns.has(name)){
                 var code=[],braces=0,started=false;
-                for(var i=Math.max(0,line-1);i<Math.min(lines.length,line+15);i++){
+                 for(var i=Math.max(0,line-1);i<Math.min(lines.length,line+20);i++){
                     code.push(lines[i]);
                     for(var j=0;j<lines[i].length;j++){var c=lines[i][j];if(c==='{'){braces++;started=true;}if(c==='}')braces--;}
                     if(started&&braces<=0&&code.length>1)break;
-                    if(code.length>=12){code.push('  // ...');break;}
+                    if(code.length>=15){code.push('  // ...');break;}
                 }
                 fns.set(name,{name:name,file:filename,line:line,code:code.join('\n')});
             }
@@ -398,7 +450,7 @@ var GitHub={
             var f=[];
             var dirs=c.filter(function(i){return i.type==='dir'&&!IGNORE.has(i.name);});
             c.forEach(function(i){
-                if(i.type==='file'&&Parser.isCode(i.name))f.push({path:i.path,name:i.name,folder:i.path.includes('/')?i.path.substring(0,i.path.lastIndexOf('/')):'',size:i.size});
+                if(i.type==='file'&&Parser.isCode(i.name))f.push({path:i.path,name:i.name,folder:i.path.includes('/')?i.path.substring(0,i.path.lastIndexOf('/')):'root',size:i.size});
             });
             if(dirs.length===0)return Promise.resolve(f);
             return new Promise(function(resolve,reject){
@@ -441,9 +493,9 @@ var GitHub={
 };
 
 function buildTree(files){
-    var root={name:'(root)',path:'',children:{},files:[]};
+    var root={name:'root',path:'',children:{},files:[]};
     files.forEach(function(f){
-        var parts=f.folder?f.folder.split('/'):[];
+        var parts=f.folder&&f.folder!=='root'?f.folder.split('/'):[];
         var cur=root;
         parts.forEach(function(p,i){
             var path=parts.slice(0,i+1).join('/');
@@ -462,21 +514,27 @@ function calcBlast(fileId,conns,files){
     var queue=[fileId];
     var visited=new Set();
     var depth=0;
+    var maxDepth=0;
     while(queue.length>0&&depth<5){
         var size=queue.length;
         for(var i=0;i<size;i++){
             var cur=queue.shift();
             if(visited.has(cur))continue;
             visited.add(cur);
-            conns.forEach(function(c){if(c.source===cur&&!visited.has(c.target)){affected.add(c.target);queue.push(c.target);}});
+             conns.forEach(function(c){
+                var src=typeof c.source==='object'?c.source.id:c.source;
+                var tgt=typeof c.target==='object'?c.target.id:c.target;
+                if(src===cur&&!visited.has(tgt)){affected.add(tgt);queue.push(tgt);maxDepth=depth+1;}
+                if(tgt===cur&&!visited.has(src)){affected.add(src);queue.push(src);maxDepth=depth+1;}
+            });
         }
         depth++;
     }
     var cnt=affected.size;
-    var pct=Math.round(cnt/files.length*100);
+    var pct=files.length>0?Math.round(cnt/files.length*100):0;
     var level='low';
     if(pct>30)level='critical';else if(pct>20)level='high';else if(pct>10)level='medium';
-    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:depth};
+    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:maxDepth};
 }
 
 function calcHealth(data){
@@ -499,18 +557,19 @@ function calcHealth(data){
 }
 
 function TreeNode(props){
-    var node=props.node,selected=props.selected,onSelect=props.onSelect,expanded=props.expanded,toggle=props.toggle;
+    var node=props.node,selected=props.selected,onSelect=props.onSelect,expanded=props.expanded,toggle=props.toggle,filterFolder=props.filterFolder,activeFilter=props.activeFilter;
     var isOpen=expanded.has(node.path);
+    var isFiltered=activeFilter===node.path;
     var children=Object.values(node.children).sort(function(a,b){return a.name.localeCompare(b.name);});
     return React.createElement('div',null,
-        React.createElement('div',{className:'tree-folder',onClick:function(){toggle(node.path);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(node.path);}}},
+        React.createElement('div',{className:'tree-folder'+(isFiltered?' filtered':''),onClick:function(e){if(e.shiftKey||e.ctrlKey||e.metaKey){filterFolder(node.path);}else{toggle(node.path);}}},
             React.createElement('span',{className:'tree-toggle'+(isOpen?' open':'')},children.length>0||node.files.length>0?'▶':''),
             React.createElement('span',null,isOpen?'📂':'📁'),
             React.createElement('span',{className:'tree-name'},node.name),
             React.createElement('span',{className:'tree-count'},countFiles(node))
         ),
         isOpen&&React.createElement('div',{className:'tree-children'},
-            children.map(function(c){return React.createElement(TreeNode,{key:c.path,node:c,selected:selected,onSelect:onSelect,expanded:expanded,toggle:toggle});}),
+            children.map(function(c){return React.createElement(TreeNode,{key:c.path,node:c,selected:selected,onSelect:onSelect,expanded:expanded,toggle:toggle,filterFolder:filterFolder,activeFilter:activeFilter});}),
             node.files.map(function(f){return React.createElement('div',{key:f.path,className:'tree-file'+(selected&&selected.path===f.path?' active':''),onClick:function(){onSelect(f.path);}},React.createElement('span',null,'📄'),React.createElement('span',{className:'tree-name'},f.name));})
         )
     );
@@ -542,23 +601,25 @@ function App(){
     var _i=useState('folder'),colorMode=_i[0],setColorMode=_i[1];
     var _j=useState(null),selected=_j[0],setSelected=_j[1];
     var _k=useState(new Set([''])),expandedPaths=_k[0],setExpandedPaths=_k[1];
-    var _l=useState(new Set()),expandedCards=_l[0],setExpandedCards=_l[1];
+     var _l=useState(new Set(['blast','fns'])),expandedCards=_l[0],setExpandedCards=_l[1];
     var _m=useState('details'),rightTab=_m[0],setRightTab=_m[1];
     var _n=useState(null),blastRadius=_n[0],setBlastRadius=_n[1];
     var _o=useState(null),ownership=_o[0],setOwnership=_o[1];
     var _p=useState(''),prUrl=_p[0],setPrUrl=_p[1];
     var _q=useState(null),prData=_q[0],setPrData=_q[1];
-    var _r=useState([]),tour=_r[0],setTour=_r[1];
-    var _s=useState(false),showExport=_s[0],setShowExport=_s[1];
-    var _t=useState(false),showPR=_t[0],setShowPR=_t[1];
-    var _u=useState(false),showTour=_u[0],setShowTour=_u[1];
-    var _v=useState(null),tooltip=_v[0],setTooltip=_v[1];
-    var _w=useState(null),toast=_w[0],setToast=_w[1];
-    var _x=useState(false),ownerLoading=_x[0],setOwnerLoading=_x[1];
+    var _r=useState(false),showExport=_r[0],setShowExport=_r[1];
+    var _s=useState(false),showPR=_s[0],setShowPR=_s[1];
+    var _t=useState(false),showPrivacy=_t[0],setShowPrivacy=_t[1];
+    var _u=useState(null),tooltip=_u[0],setTooltip=_u[1];
+    var _v=useState(null),toast=_v[0],setToast=_v[1];
+    var _w=useState(false),ownerLoading=_w[0],setOwnerLoading=_w[1];
+    var _x=useState(null),folderFilter=_x[0],setFolderFilter=_x[1];
+    var _y=useState(new Set()),expandedFns=_y[0],setExpandedFns=_y[1];
     var svgRef=useRef(null);
     var zoomRef=useRef(null);
     var simRef=useRef(null);
-    var selectRef=useRef(null);
+    var nodesRef=useRef(null);
+    var linksRef=useRef(null);
 
     useEffect(function(){document.body.className=theme==='light'?'light':'';},[theme]);
 
@@ -584,25 +645,22 @@ function App(){
 
     function analyze(){
         var p=parseUrl(repoUrl);
-        if(!p){setError('Invalid URL. Use format: owner/repo or https://github.com/owner/repo');return;}
-        setError(null);setData(null);setSelected(null);setLoading(true);setProgress('Checking repository access...');
+        if(!p){setError('Invalid URL. Use format: owner/repo');return;}
+        setError(null);setData(null);setSelected(null);setBlastRadius(null);setLoading(true);setProgress('Scanning repository...');setFolderFilter(null);
         GitHub.token=token||null;
         setRepoInfo(p);
         
         GitHub.scan(p.owner,p.repo,setProgress).then(function(files){
             if(!files.length)throw new Error('No code files found. The repository may be empty or inaccessible.');
             var max=Math.min(files.length,100);
-            if(files.length>100)setError('Found '+files.length+' files. Analyzing first 100 for performance.');
+            if(files.length>100)showNotification('Found '+files.length+' files. Analyzing first 100.','warning');
             var analyzed=[];
             var allFns=[];
             
             function processFile(i){
-                if(i>=max){
-                    finishAnalysis();
-                    return;
-                }
+              if(i>=max){finishAnalysis();return;}
                 var f=files[i];
-                setProgress((i+1)+'/'+max+': '+f.name);
+                setProgress('Analyzing '+(i+1)+'/'+max+': '+f.name);
                 Promise.all([
                     GitHub.getFile(p.owner,p.repo,f.path),
                     GitHub.getCommits(p.owner,p.repo,f.path,10).catch(function(){return[];})
@@ -627,7 +685,7 @@ function App(){
             }
             
             function finishAnalysis(){
-                setProgress('Building graph...');
+                setProgress('Building dependency graph...');
                 var fnNames=[...new Set(allFns.map(function(f){return f.name;}))];
                 var conns=[];
                 var fnStats={};
@@ -648,17 +706,17 @@ function App(){
                 Object.values(fnStats).forEach(function(s){s.callers=Array.from(s.callers.values());});
                 var issues=[];
                 var deadFns=Object.entries(fnStats).filter(function(x){return x[1].count===0;});
-                if(deadFns.length)issues.push({type:'warning',title:deadFns.length+' Unused Functions',desc:'Not called externally',items:deadFns.slice(0,8).map(function(x){return{name:x[0],file:x[1].file};})});
-                var godFiles=analyzed.filter(function(f){return f.functions.length>20;});
-                if(godFiles.length)issues.push({type:'critical',title:godFiles.length+' Large Files',desc:'20+ functions',items:godFiles.slice(0,5).map(function(f){return{name:f.name,file:f.path};})});
+                if(deadFns.length)issues.push({type:'warning',title:deadFns.length+' Unused Functions',desc:'Functions not called from other files',items:deadFns.slice(0,10).map(function(x){return{name:x[0],file:x[1].file};})});
+                var godFiles=analyzed.filter(function(f){return f.functions.length>15;});
+                if(godFiles.length)issues.push({type:'critical',title:godFiles.length+' Large Files',desc:'Files with 15+ functions',items:godFiles.slice(0,5).map(function(f){return{name:f.name+' ('+f.functions.length+' fns)',file:f.path};})});
                 var coupling={};
                 conns.forEach(function(c){coupling[c.target]=(coupling[c.target]||0)+1;});
-                var highCoup=Object.entries(coupling).filter(function(x){return x[1]>10;});
-                if(highCoup.length)issues.push({type:'warning',title:highCoup.length+' Highly Coupled',desc:'Imported by 10+',items:highCoup.slice(0,5).map(function(x){return{name:x[0].split('/').pop(),file:x[0]};})});
+                var highCoup=Object.entries(coupling).filter(function(x){return x[1]>8;});
+                if(highCoup.length)issues.push({type:'warning',title:highCoup.length+' Highly Coupled',desc:'Files imported by 8+ others',items:highCoup.slice(0,5).map(function(x){return{name:x[0].split('/').pop()+' ('+x[1]+' imports)',file:x[0]};})});
                 var connSet=new Set(conns.map(function(c){return c.source+'|'+c.target;}));
                 var circular=[];
                 conns.forEach(function(c){if(connSet.has(c.target+'|'+c.source)){var key=[c.source,c.target].sort().join('|');if(!circular.includes(key))circular.push(key);}});
-                if(circular.length)issues.push({type:'critical',title:circular.length+' Circular Deps',desc:'Files importing each other',items:circular.slice(0,5).map(function(p){return{name:p.split('|').map(function(x){return x.split('/').pop();}).join(' ↔ ')};})});
+                if(circular.length)issues.push({type:'critical',title:circular.length+' Circular Dependencies',desc:'Files that import each other',items:circular.slice(0,5).map(function(p){return{name:p.split('|').map(function(x){return x.split('/').pop();}).join(' ↔ ')};})});
                 var patterns=Parser.detectPatterns(analyzed);
                 var securityIssues=Parser.detectSecurity(analyzed);
                 var folders=[...new Set(analyzed.map(function(f){return f.folder;}))].sort();
@@ -696,25 +754,43 @@ function App(){
             var blast=calcBlast(path,data.connections,data.files);
             setBlastRadius(blast);
             setOwnership(null);
+            setExpandedFns(new Set());
             if(repoInfo){
                 setOwnerLoading(true);
                 GitHub.getBlame(repoInfo.owner,repoInfo.repo,path).then(function(owners){setOwnership(owners);setOwnerLoading(false);}).catch(function(){setOwnerLoading(false);});
             }
+            updateGraphHighlight(path,blast);
         }
     },[data,repoInfo]);
 
-    selectRef.current=selectFile;
+   function updateGraphHighlight(path,blast){
+        if(!nodesRef.current||!linksRef.current)return;
+        var affectedSet=new Set(blast?blast.affected:[]);
+        nodesRef.current.selectAll('.nc').transition().duration(200)
+            .attr('opacity',function(n){if(n.id===path)return 1;if(affectedSet.has(n.id))return 1;return path?0.2:1;})
+            .attr('fill',function(n){if(n.id===path)return'#ff5f5f';if(affectedSet.has(n.id))return'#ff9f43';return getNodeColor(n);});
+        linksRef.current.transition().duration(200)
+            .attr('stroke-opacity',function(l){var src=l.source.id||l.source;var tgt=l.target.id||l.target;if(src===path||tgt===path)return 0.8;return path?0.05:0.4;})
+            .attr('stroke',function(l){var src=l.source.id||l.source;var tgt=l.target.id||l.target;if(src===path||tgt===path)return'var(--acc)';return theme==='light'?'#ccc':'#333';});
+    }
+
+    function getNodeColor(d){
+        if(colorMode==='folder')return colorMap[d.folder]||COLORS[0];
+        if(colorMode==='layer')return LAYER_COLORS[d.layer]||COLORS[0];
+        if(colorMode==='churn')return colorMap[d.id]||'#22c55e';
+        return COLORS[0];
+    }
 
     var togglePath=useCallback(function(p){setExpandedPaths(function(prev){var n=new Set(prev);if(n.has(p))n.delete(p);else n.add(p);return n;});},[]);
     var toggleCard=useCallback(function(id){setExpandedCards(function(prev){var n=new Set(prev);if(n.has(id))n.delete(id);else n.add(id);return n;});},[]);
-
+    var toggleFn=useCallback(function(name){setExpandedFns(function(prev){var n=new Set(prev);if(n.has(name))n.delete(name);else n.add(name);return n;});},[]);
     var colorMap=useMemo(function(){
         if(!data)return{};
         var m={};
-        if(colorMode==='folder'){data.folders.forEach(function(f,i){m[f]=COLORS[i%COLORS.length];});m['']=COLORS[0];}
+        if(colorMode==='folder'){data.folders.forEach(function(f,i){m[f]=COLORS[i%COLORS.length];});m['root']=COLORS[0];}
         else if(colorMode==='layer')data.files.forEach(function(f){m[f.path]=LAYER_COLORS[f.layer]||COLORS[0];});
         else if(colorMode==='churn'){
-            var maxC=Math.max.apply(null,data.files.map(function(f){return f.churn||0;}));
+            var maxC=Math.max.apply(null,data.files.map(function(f){return f.churn||0;}))||1;
             data.files.forEach(function(f){var r=(f.churn||0)/maxC;m[f.path]=r>0.7?'#ff5f5f':r>0.4?'#ff9f43':'#22c55e';});
         }
         return m;
@@ -726,20 +802,22 @@ function App(){
         svg.selectAll('*').remove();
         var w=svgRef.current.clientWidth;
         var h=svgRef.current.clientHeight;
-        var nodes=data.files.map(function(f){return{id:f.path,name:f.name,folder:f.folder,fnCount:f.functions.length,layer:f.layer,churn:f.churn||0};});
+       var filteredFiles=folderFilter?data.files.filter(function(f){return f.folder===folderFilter||f.folder.startsWith(folderFilter+'/');}):data.files;
+        var fileIds=new Set(filteredFiles.map(function(f){return f.path;}));
+        var nodes=filteredFiles.map(function(f){return{id:f.path,name:f.name,folder:f.folder,fnCount:f.functions.length,layer:f.layer,churn:f.churn||0};});
         var linkMap=new Map();
-        data.connections.forEach(function(c){var k=c.source+'|'+c.target;if(!linkMap.has(k))linkMap.set(k,{source:c.source,target:c.target,count:0});linkMap.get(k).count+=c.count;});
+         data.connections.forEach(function(c){
+            if(!fileIds.has(c.source)||!fileIds.has(c.target))return;
+            var k=c.source+'|'+c.target;
+            if(!linkMap.has(k))linkMap.set(k,{source:c.source,target:c.target,count:0});
+            linkMap.get(k).count+=c.count;
+        });
         var links=Array.from(linkMap.values());
         function getR(d){return Math.max(8,Math.min(24,5+d.fnCount*0.8));}
         function getC(d){
             if(colorMode==='folder')return colorMap[d.folder]||COLORS[0];
             if(colorMode==='layer')return LAYER_COLORS[d.layer]||COLORS[0];
             if(colorMode==='churn')return colorMap[d.id]||'#22c55e';
-            if(colorMode==='blast'&&blastRadius){
-                if(selected&&d.id===selected.path)return'#ff5f5f';
-                if(blastRadius.affected.includes(d.id))return'#ff9f43';
-                return'#333';
-            }
             return COLORS[0];
         }
         var folders=[...new Set(nodes.map(function(n){return n.folder;}))];
@@ -766,18 +844,15 @@ function App(){
             .velocityDecay(0.6).alphaDecay(0.05);
         simRef.current=sim;
         var link=linkLayer.selectAll('path').data(links).join('path').attr('fill','none').attr('stroke',theme==='light'?'#ccc':'#333').attr('stroke-width',function(d){return Math.max(1,Math.min(2,Math.sqrt(d.count)*0.3));}).attr('stroke-opacity',0.4).attr('marker-end','url(#arr)');
+        linksRef.current=link;
         var node=nodeLayer.selectAll('g').data(nodes).join('g').style('cursor','pointer');
+        nodesRef.current=node;
         node.call(d3.drag().on('start',function(e,d){if(!e.active)sim.alphaTarget(0.1).restart();d.fx=d.x;d.fy=d.y;}).on('drag',function(e,d){d.fx=e.x;d.fy=e.y;}).on('end',function(e,d){if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
-        node.on('click',function(e,d){
-            e.stopPropagation();
-            if(selectRef.current)selectRef.current(d.id);
-            link.attr('stroke',function(l){return(l.source.id===d.id||l.target.id===d.id)?'var(--acc)':(theme==='light'?'#ccc':'#333');}).attr('stroke-opacity',function(l){return(l.source.id===d.id||l.target.id===d.id)?1:0.1;});
-            node.selectAll('.nc').attr('opacity',function(n){if(n.id===d.id)return 1;return links.some(function(l){return(l.source.id===d.id&&l.target.id===n.id)||(l.target.id===d.id&&l.source.id===n.id);})?1:0.2;});
-        });
-        node.on('mouseenter',function(e,d){var r=svgRef.current.getBoundingClientRect();setTooltip({x:e.clientX-r.left+10,y:e.clientY-r.top,title:d.name,content:d.fnCount+' functions\n'+d.layer+' layer\n'+d.churn+' commits'});}).on('mouseleave',function(){setTooltip(null);});
-        svg.on('click',function(e){if(e.target===svgRef.current){setSelected(null);setBlastRadius(null);link.attr('stroke',theme==='light'?'#ccc':'#333').attr('stroke-opacity',0.4);node.selectAll('.nc').attr('opacity',1);}});
-        node.append('circle').attr('class','nc').attr('r',getR).attr('fill',getC).attr('stroke',function(d){return d3.color(getC(d)).brighter(0.3);}).attr('stroke-width',1.5);
-        node.append('text').attr('text-anchor','middle').attr('dy',0).attr('fill',theme==='light'?'#333':'#eee').attr('font-size','6px').attr('font-family','JetBrains Mono').attr('pointer-events','none').text(function(d){var n=d.name.replace(/\.[^.]+$/,'');return n.length>4?n.slice(0,3)+'…':n;});
+         node.on('click',function(e,d){e.stopPropagation();selectFile(d.id);});
+        node.on('mouseenter',function(e,d){var r=svgRef.current.getBoundingClientRect();setTooltip({x:e.clientX-r.left+10,y:e.clientY-r.top,title:d.name,content:d.fnCount+' functions\n'+d.layer+' layer\n'+d.churn+' recent commits'});}).on('mouseleave',function(){setTooltip(null);});
+        svg.on('click',function(e){if(e.target===svgRef.current){setSelected(null);setBlastRadius(null);link.attr('stroke',theme==='light'?'#ccc':'#333').attr('stroke-opacity',0.4);node.selectAll('.nc').attr('opacity',1).attr('fill',getC);}});
+        node.append('circle').attr('class','nc').attr('r',getR).attr('fill',getC).attr('stroke',function(d){var c=d3.color(getC(d));return c?c.brighter(0.3):'#fff';}).attr('stroke-width',1.5);
+        node.append('text').attr('text-anchor','middle').attr('dy',0).attr('fill',theme==='light'?'#333':'#eee').attr('font-size','6px').attr('font-family','Source Code Pro Mono').attr('pointer-events','none').text(function(d){var n=d.name.replace(/\.[^.]+$/,'');return n.length>5?n.slice(0,4)+'…':n;});
         function updateHulls(){
             hullLayer.selectAll('*').remove();
             if(colorMode!=='folder')return;
@@ -785,14 +860,15 @@ function App(){
                 var fn=nodes.filter(function(n){return n.folder===f;});
                 if(fn.length<2)return;
                 var pad=20,pts=[];
-                fn.forEach(function(n){pts.push([n.x-pad,n.y-pad],[n.x+pad,n.y-pad],[n.x-pad,n.y+pad],[n.x+pad,n.y+pad]);});
+                fn.forEach(function(n){if(n.x&&n.y)pts.push([n.x-pad,n.y-pad],[n.x+pad,n.y-pad],[n.x-pad,n.y+pad],[n.x+pad,n.y+pad]);});
+                if(pts.length<3)return;
                 var hull=d3.polygonHull(pts);
                 if(hull)hullLayer.append('path').attr('d','M'+hull.join('L')+'Z').attr('fill','none').attr('stroke',colorMap[f]||COLORS[0]).attr('stroke-width',1).attr('stroke-opacity',0.15).attr('stroke-dasharray','3,3');
             });
         }
         sim.on('tick',function(){link.attr('d',function(d){var dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dr=Math.sqrt(dx*dx+dy*dy);return'M'+d.source.x+','+d.source.y+'A'+dr+','+dr+' 0 0,1 '+d.target.x+','+d.target.y;});node.attr('transform',function(d){return'translate('+d.x+','+d.y+')';});updateHulls();});
         return function(){sim.stop();};
-    },[data,colorMap,colorMode,theme,blastRadius,selected]);
+    },[data,colorMap,colorMode,theme,folderFilter]);
 
     function zoomIn(){if(zoomRef.current&&svgRef.current)d3.select(svgRef.current).transition().duration(200).call(zoomRef.current.scaleBy,1.4);}
     function zoomOut(){if(zoomRef.current&&svgRef.current)d3.select(svgRef.current).transition().duration(200).call(zoomRef.current.scaleBy,0.7);}
@@ -808,17 +884,17 @@ function App(){
         d3.select(svgRef.current).transition().duration(400).call(zoomRef.current.transform,d3.zoomIdentity.translate(w/2-scale*(minX+maxX)/2,h/2-scale*(minY+maxY)/2).scale(Math.min(scale,2)));
     }
     function exportSVG(){if(!svgRef.current)return;var svgClone=svgRef.current.cloneNode(true);svgClone.setAttribute('xmlns','http://www.w3.org/2000/svg');svgClone.setAttribute('width',svgRef.current.clientWidth);svgClone.setAttribute('height',svgRef.current.clientHeight);var style=document.createElementNS('http://www.w3.org/2000/svg','style');style.textContent='text{font-family:Source Code Pro Mono,monospace;pointer-events:none}';svgClone.insertBefore(style,svgClone.firstChild);var blob=new Blob([new XMLSerializer().serializeToString(svgClone)],{type:'image/svg+xml'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-'+Date.now()+'.svg';a.click();URL.revokeObjectURL(url);}
-    function exportJSON(){if(!data)return;var blob=new Blob([JSON.stringify({stats:data.stats,files:data.files.map(function(f){return{path:f.path,fns:f.functions.length,layer:f.layer};}),connections:data.connections,issues:data.issues},null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens.json';a.click();}
+       function exportJSON(){if(!data)return;var blob=new Blob([JSON.stringify({stats:data.stats,files:data.files.map(function(f){return{path:f.path,fns:f.functions.length,layer:f.layer,lines:f.lines};}),connections:data.connections,issues:data.issues,patterns:data.patterns,security:data.securityIssues},null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-analysis.json';a.click();}
     function showNotification(msg,type){setToast({msg:msg,type:type||'success'});setTimeout(function(){setToast(null);},3000);}
     function copyLink(){navigator.clipboard.writeText(window.location.href).then(function(){showNotification('Link copied to clipboard!');}).catch(function(){showNotification('Failed to copy link','error');});}
-    function analyzePR(){if(!prUrl||!repoInfo)return;var m=prUrl.match(/\/pull\/(\d+)/);if(!m){alert('Invalid PR URL');return;}GitHub.getPR(repoInfo.owner,repoInfo.repo,m[1]).then(setPrData);}
-    function addToTour(f){setTour(function(prev){return prev.concat([{file:f.path,name:f.name,note:''}]);});}
-    function resetAnalysis(){setData(null);setSelected(null);setBlastRadius(null);setOwnership(null);setRepoInfo(null);setRepoUrl('');setPrData(null);setTour([]);window.history.replaceState({},'',window.location.pathname);}
+     function analyzePR(){if(!prUrl||!repoInfo)return;var m=prUrl.match(/\/pull\/(\d+)/);if(!m){showNotification('Invalid PR URL','error');return;}GitHub.getPR(repoInfo.owner,repoInfo.repo,m[1]).then(function(pr){if(pr)setPrData(pr);else showNotification('Could not load PR','error');});}
+    function resetAnalysis(){setData(null);setSelected(null);setBlastRadius(null);setOwnership(null);setRepoInfo(null);setRepoUrl('');setPrData(null);setFolderFilter(null);window.history.replaceState({},'',window.location.pathname);}
+    function filterByFolder(path){setFolderFilter(folderFilter===path?null:path);}
     var health=useMemo(function(){return calcHealth(data);},[data]);
 
     return React.createElement('div',{className:'app'},
         React.createElement('div',{className:'topbar'},
-            React.createElement('div',{className:'logo'},
+             React.createElement('div',{className:'logo',onClick:function(){setShowPrivacy(true);}},
                 React.createElement('div',{className:'logo-mark'},
                     React.createElement('div',{className:'logo-icon',dangerouslySetInnerHTML:{__html:'<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="url(#iconGrad)" stroke="#22d3ee" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="#0a0a0c" stroke="#22d3ee" stroke-width="1.5"/><circle cx="12" cy="12" r="1.5" fill="#22d3ee"/><defs><linearGradient id="iconGrad" x1="12" y1="2" x2="12" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#22d3ee" stop-opacity="0.2"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0.05"/></linearGradient></defs></svg>'}})
                 ),
@@ -833,7 +909,6 @@ function App(){
             ),
             React.createElement('div',{className:'topbar-actions'},
                React.createElement('button',{className:'top-btn','aria-label':'Analyze Pull Request',onClick:function(){setShowPR(true);},disabled:!data},'📊 PR'),
-                React.createElement('button',{className:'top-btn','aria-label':'Create guided tour',onClick:function(){setShowTour(true);},disabled:!data},'🎓 Tour'),
                 React.createElement('button',{className:'top-btn','aria-label':'Export analysis',onClick:function(){setShowExport(true);},disabled:!data},'📤'),
                 React.createElement('button',{className:'top-btn','aria-label':'Copy share link',onClick:copyLink,disabled:!data},'🔗'),
                 React.createElement('button',{className:'top-btn','aria-label':'Toggle theme',onClick:function(){setTheme(function(t){return t==='dark'?'light':'dark';});}},theme==='dark'?'☀️':'🌙')
@@ -854,10 +929,9 @@ function App(){
                     React.createElement('div',{className:'sidebar-section'},
                         React.createElement('div',{className:'sidebar-title'},'Color By'),
                         React.createElement('div',{className:'view-modes'},
-                            React.createElement('div',{className:'view-mode'+(colorMode==='folder'?' active':''),onClick:function(){setColorMode('folder');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('folder');}}},React.createElement('span',{className:'view-mode-icon'},'📁'),'Folder'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='layer'?' active':''),onClick:function(){setColorMode('layer');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('layer');}}},React.createElement('span',{className:'view-mode-icon'},'🏗️'),'Layer'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='churn'?' active':''),onClick:function(){setColorMode('churn');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('churn');}}},React.createElement('span',{className:'view-mode-icon'},'🔥'),'Churn'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='blast'?' active':''),onClick:function(){setColorMode('blast');},style:{opacity:selected?1:0.5},role:'button',tabIndex:selected?0:-1,onKeyDown:function(e){if((e.key==='Enter'||e.key===' ')&&selected){e.preventDefault();setColorMode('blast');}}},React.createElement('span',{className:'view-mode-icon'},'💥'),'Blast')
+                            React.createElement('div',{className:'view-mode'+(colorMode==='folder'?' active':''),onClick:function(){setColorMode('folder');}},React.createElement('span',{className:'view-mode-icon'},'📁'),'Folder'),
+                            React.createElement('div',{className:'view-mode'+(colorMode==='layer'?' active':''),onClick:function(){setColorMode('layer');}},React.createElement('span',{className:'view-mode-icon'},'🏗️'),'Layer'),
+                            React.createElement('div',{className:'view-mode'+(colorMode==='churn'?' active':''),onClick:function(){setColorMode('churn');}},React.createElement('span',{className:'view-mode-icon'},'🔥'),'Churn') 
                         )
                     ),
                     React.createElement('div',{className:'sidebar-section'},
@@ -868,8 +942,11 @@ function App(){
                             React.createElement('div',{className:'stat-card'+(data.stats.dead>10?' warn':'')},React.createElement('div',{className:'stat-value'},data.stats.dead),React.createElement('div',{className:'stat-label'},'Unused'))
                         )
                     ),
-                    React.createElement('div',{className:'sidebar-section',style:{paddingBottom:8}},React.createElement('div',{className:'sidebar-title'},'Explorer')),
-                    React.createElement('div',{className:'sidebar-scroll'},React.createElement(TreeNode,{node:data.tree,selected:selected,onSelect:selectFile,expanded:expandedPaths,toggle:togglePath}))
+                    React.createElement('div',{className:'sidebar-section',style:{paddingBottom:8}},
+                        React.createElement('div',{className:'sidebar-title'},'Explorer'),
+                        folderFilter&&React.createElement('button',{className:'top-btn',style:{width:'100%',marginTop:8},onClick:function(){setFolderFilter(null);}},'✕ Clear Filter: ',folderFilter)
+                    ),
+                    React.createElement('div',{className:'sidebar-scroll'},React.createElement(TreeNode,{node:data.tree,selected:selected,onSelect:selectFile,expanded:expandedPaths,toggle:togglePath,filterFolder:filterByFolder,activeFilter:folderFilter}))
                 ):React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🔍'),React.createElement('div',{className:'empty-title'},'No Repository'),React.createElement('div',{className:'empty-desc'},'Enter a GitHub URL to analyze'))
             ),
             React.createElement('div',{className:'canvas-area'},
@@ -878,20 +955,22 @@ function App(){
                 React.createElement(React.Fragment,null,
                     React.createElement('svg',{ref:svgRef}),
                     React.createElement('div',{className:'canvas-toolbar'},
-                        React.createElement('button',{className:'tool-btn',onClick:zoomIn},'+'),
-                        React.createElement('button',{className:'tool-btn',onClick:zoomOut},'−'),
-                        React.createElement('button',{className:'tool-btn',onClick:resetZoom},'⟲'),
-                        React.createElement('button',{className:'tool-btn',onClick:fitView},'⊡')
+                        React.createElement('button',{className:'tool-btn',onClick:zoomIn,'aria-label':'Zoom in'},'+'),
+                        React.createElement('button',{className:'tool-btn',onClick:zoomOut,'aria-label':'Zoom out'},'−'),
+                        React.createElement('button',{className:'tool-btn',onClick:resetZoom,'aria-label':'Reset zoom'},'⟲'),
+                        React.createElement('button',{className:'tool-btn',onClick:fitView,'aria-label':'Fit view'},'⊡')
                     ),
                     React.createElement('div',{className:'canvas-info'},
-                        React.createElement('div',{className:'info-chip'},React.createElement('strong',null,data.files.length),' files'),
+                        React.createElement('div',{className:'info-chip'},React.createElement('strong',null,folderFilter?data.files.filter(function(f){return f.folder===folderFilter||f.folder.startsWith(folderFilter+'/');}).length:data.files.length),' files'),
                         React.createElement('div',{className:'info-chip'},React.createElement('strong',null,data.connections.length),' links'),
                         selected&&blastRadius&&React.createElement('div',{className:'info-chip'},'💥 ',React.createElement('strong',null,blastRadius.count),' affected')
                     ),
-                    colorMode!=='blast'&&React.createElement('div',{className:'legend'},
+                    React.createElement('div',{className:'legend'},
                         React.createElement('div',{className:'legend-title'},colorMode==='folder'?'Folders':colorMode==='layer'?'Layers':'Churn'),
+                        colorMode==='folder'&&data.folders.slice(0,12).map(function(f,i){return React.createElement('div',{key:f,className:'legend-item'+(folderFilter===f?' active':''),onClick:function(){filterByFolder(f);}},React.createElement('div',{className:'legend-color',style:{background:colorMap[f]||COLORS[i%COLORS.length]}}),f||'root');}),
+                        colorMode==='folder'&&data.folders.length>12&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginTop:4}},'+',data.folders.length-12,' more'),
                         colorMode==='layer'&&Object.entries(LAYER_COLORS).map(function(e){return React.createElement('div',{key:e[0],className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:e[1]}}),e[0]);}),
-                        colorMode==='churn'&&React.createElement(React.Fragment,null,React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff5f5f'}}),'High'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff9f43'}}),'Medium'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#22c55e'}}),'Low'))
+                        colorMode==='churn'&&React.createElement(React.Fragment,null,React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff5f5f'}}),'High (7+ commits)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#ff9f43'}}),'Medium (4-6)'),React.createElement('div',{className:'legend-item'},React.createElement('div',{className:'legend-color',style:{background:'#22c55e'}}),'Low (0-3)'))
                     ),
                     tooltip&&React.createElement('div',{className:'tooltip',style:{left:tooltip.x,top:tooltip.y}},React.createElement('div',{className:'tooltip-title'},tooltip.title),React.createElement('div',{className:'tooltip-content'},tooltip.content))
                 )
@@ -900,46 +979,102 @@ function App(){
                 data?React.createElement(React.Fragment,null,
                     React.createElement('div',{className:'panel-tabs'},
                         React.createElement('button',{className:'panel-tab'+(rightTab==='details'?' active':''),onClick:function(){setRightTab('details');}},selected?'📄 FILE':'🔍 ISSUES'),
-                        React.createElement('button',{className:'panel-tab'+(rightTab==='patterns'?' active':''),onClick:function(){setRightTab('patterns');}},'🧩 PATTERNS'),
+                        React.createElement('button',{className:'panel-tab'+(rightTab==='patterns'?' active':''),onClick:function(){setRightTab('patterns');}},'🧩 PATTERNS ',React.createElement('span',{className:'badge badge-default'},data.patterns.length)),
                         React.createElement('button',{className:'panel-tab'+(rightTab==='security'?' active':''),onClick:function(){setRightTab('security');}},'🔐 SECURITY',data.stats.security>0&&React.createElement('span',{className:'view-mode-badge',style:{marginLeft:4}},data.stats.security))
                     ),
                     React.createElement('div',{className:'panel-content'},
                         rightTab==='details'&&(selected?React.createElement(React.Fragment,null,
-                            React.createElement('button',{className:'top-btn',style:{width:'100%',marginBottom:12},onClick:function(){setSelected(null);setBlastRadius(null);}},'← Back'),
-                            React.createElement('div',{className:'panel-header',style:{margin:'-12px -12px 12px',padding:12}},React.createElement('div',{className:'panel-title'},'📄 ',selected.name),React.createElement('div',{className:'panel-subtitle'},selected.folder||'(root)',' • ',selected.layer)),
+                             React.createElement('button',{className:'top-btn',style:{width:'100%',marginBottom:12},onClick:function(){setSelected(null);setBlastRadius(null);if(nodesRef.current){nodesRef.current.selectAll('.nc').transition().duration(200).attr('opacity',1).attr('fill',getNodeColor);}if(linksRef.current){linksRef.current.transition().duration(200).attr('stroke-opacity',0.4).attr('stroke',theme==='light'?'#ccc':'#333');}}},'← Back to Issues'),
+                            React.createElement('div',{className:'panel-header',style:{margin:'-12px -12px 12px',padding:12}},React.createElement('div',{className:'panel-title'},'📄 ',selected.name),React.createElement('div',{className:'panel-subtitle'},selected.folder||'root',' • ',selected.layer,' • ',selected.lines,' lines')),
                             blastRadius&&React.createElement('div',{className:'card',style:{marginBottom:12}},
-                                React.createElement('div',{className:'card-header',style:{cursor:'default'}},React.createElement('div',{className:'card-title'},'💥 Blast Radius'),React.createElement('span',{className:'badge badge-'+(blastRadius.level==='low'?'success':blastRadius.level==='medium'?'warning':'danger')},blastRadius.level.toUpperCase())),
-                                React.createElement('div',{className:'card-body'},
-                                    React.createElement('div',{style:{marginBottom:8}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,marginBottom:4}},React.createElement('span',null,'Impact'),React.createElement('span',null,blastRadius.count,' files (',blastRadius.percent,'%)')),React.createElement('div',{className:'progress-bar'},React.createElement('div',{className:'progress-fill',style:{width:blastRadius.percent+'%',background:blastRadius.level==='low'?'var(--green)':blastRadius.level==='medium'?'var(--orange)':'var(--red)'}}))),
-                                    React.createElement('div',{style:{fontSize:9,color:'var(--t3)'}},'Changes affect ',blastRadius.count,' files up to ',blastRadius.depth,' levels')
+                               React.createElement('div',{className:'card-header',onClick:function(){toggleCard('blast');}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('blast')?' open':'')},'▶'),'💥 Blast Radius'),React.createElement('span',{className:'badge badge-'+(blastRadius.level==='low'?'success':blastRadius.level==='medium'?'warning':'danger')},blastRadius.level.toUpperCase())),
+                                expandedCards.has('blast')&&React.createElement('div',{className:'card-body'},
+                                    React.createElement('div',{style:{marginBottom:8}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,marginBottom:4}},React.createElement('span',null,'Impact'),React.createElement('span',null,blastRadius.count,' files (',blastRadius.percent,'%)')),React.createElement('div',{className:'progress-bar'},React.createElement('div',{className:'progress-fill',style:{width:Math.min(100,blastRadius.percent)+'%',background:blastRadius.level==='low'?'var(--green)':blastRadius.level==='medium'?'var(--orange)':'var(--red)'}}))),
+                                    React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginBottom:8}},'Changes to this file propagate up to ',blastRadius.depth,' levels deep'),
+                                    blastRadius.affected.length>0&&React.createElement('div',{className:'blast-detail'},
+                                        React.createElement('div',{style:{fontSize:9,fontWeight:600,marginBottom:6}},'Affected Files:'),
+                                        blastRadius.affected.slice(0,10).map(function(path){return React.createElement('div',{key:path,className:'blast-file',onClick:function(){selectFile(path);}},'📄 ',path.split('/').pop());}),
+                                        blastRadius.affected.length>10&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginTop:4}},'+',blastRadius.affected.length-10,' more files')
+                                    )
                                 )
                             ),
                             ownership&&ownership.length>0&&React.createElement('div',{className:'card',style:{marginBottom:12}},
                                 React.createElement('div',{className:'card-header',onClick:function(){toggleCard('own');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCard('own');}}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('own')?' open':'')},'▶'),'👥 Ownership')),
                                 expandedCards.has('own')&&React.createElement('div',{className:'card-body'},
                                     React.createElement('div',{className:'owner-bar'},ownership.slice(0,5).map(function(o,i){return React.createElement('div',{key:i,className:'owner-segment',style:{width:o.percent+'%',background:COLORS[i%COLORS.length]}});})),
-                                    React.createElement('div',{className:'owner-list'},ownership.slice(0,5).map(function(o,i){return React.createElement('div',{key:i,className:'owner-item'},React.createElement('div',{className:'owner-avatar',style:{background:COLORS[i%COLORS.length]}},o.name[0]),React.createElement('span',{className:'owner-name'},o.name),React.createElement('span',{className:'owner-percent'},o.percent,'%'));}))
+                                    React.createElement('div',{className:'owner-list'},ownership.slice(0,5).map(function(o,i){return React.createElement('div',{key:i,className:'owner-item'},React.createElement('div',{className:'owner-avatar',style:{background:COLORS[i%COLORS.length]}},o.name[0].toUpperCase()),React.createElement('span',{className:'owner-name'},o.name),React.createElement('span',{className:'owner-percent'},o.percent,'%'));}))
                                 )
                             ),
                             React.createElement('div',{className:'card'},
                                 React.createElement('div',{className:'card-header',onClick:function(){toggleCard('fns');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCard('fns');}}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('fns')?' open':'')},'▶'),'⚡ Functions (',selected.functions.length,')')),
-                                expandedCards.has('fns')&&React.createElement('div',{className:'card-body'},
-                                    selected.functions.slice(0,8).map(function(fn){var st=data.fnStats[fn.name];return React.createElement('div',{key:fn.name,style:{marginBottom:6,padding:6,background:'var(--bg0)',borderRadius:4}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between'}},React.createElement('span',{style:{color:'var(--cyan)',fontSize:10}},fn.name,'()'),React.createElement('span',{className:'badge '+(st&&st.count>10?'badge-danger':st&&st.count>0?'badge-warning':'badge-default')},st?st.count:0,'×')));}),
-                                    selected.functions.length>8&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',textAlign:'center'}},'+',selected.functions.length-8,' more')
+                                expandedCards.has('fns')&&React.createElement('div',{className:'card-body',style:{padding:8}},
+                                    selected.functions.length===0?React.createElement('div',{style:{fontSize:10,color:'var(--t3)',padding:8,textAlign:'center'}},'No functions detected'):
+                                    selected.functions.map(function(fn){
+                                        var st=data.fnStats[fn.name];
+                                        var isExpanded=expandedFns.has(fn.name);
+                                        return React.createElement('div',{key:fn.name,className:'fn-item'},
+                                            React.createElement('div',{className:'fn-header',onClick:function(){toggleFn(fn.name);}},
+                                                React.createElement('span',{className:'fn-name'},fn.name,'()'),
+                                                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:6}},
+                                                    React.createElement('span',{className:'fn-line'},'L',fn.line),
+                                                    React.createElement('span',{className:'badge '+(st&&st.count>10?'badge-danger':st&&st.count>0?'badge-warning':'badge-default')},st?st.count:0,' calls')
+                                                )
+                                            ),
+                                            isExpanded&&fn.code&&React.createElement('div',{className:'fn-code'},fn.code)
+                                        );
+                                    })
                                 )
-                            ),
-                            React.createElement('button',{className:'top-btn',style:{width:'100%',marginTop:12},onClick:function(){addToTour(selected);}},'🎓 Add to Tour')
+                           )
                         ):React.createElement(React.Fragment,null,
-                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🔍 Issues (',data.issues.length,')'),
-                            data.issues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+(issue.type==='critical'?'high':'medium')},React.createElement('div',{className:'security-title'},issue.type==='critical'?'🔴':'🟡',' ',issue.title),React.createElement('div',{className:'security-path'},issue.desc));})
+                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🔍 Architecture Issues (',data.issues.length,')'),
+                            data.issues.length===0?React.createElement('div',{style:{textAlign:'center',padding:20}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'✨'),React.createElement('div',{style:{color:'var(--green)'}},'No issues detected!')):
+                            data.issues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+(issue.type==='critical'?'high':'medium')},
+                                React.createElement('div',{className:'security-header'},
+                                    React.createElement('span',null,issue.type==='critical'?'🔴':'🟡'),
+                                    React.createElement('span',{className:'security-title'},issue.title)
+                                ),
+                                React.createElement('div',{className:'security-desc'},issue.desc),
+                                issue.items&&issue.items.slice(0,5).map(function(item,j){return React.createElement('div',{key:j,className:'security-path',style:{cursor:'pointer'},onClick:function(){if(item.file)selectFile(item.file);}},item.name);})
+                            );})
                         )),
                         rightTab==='patterns'&&React.createElement(React.Fragment,null,
-                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🧩 Patterns (',data.patterns.length,')'),
-                            data.patterns.length===0?React.createElement('div',{style:{textAlign:'center',padding:20,color:'var(--t3)'}},'No patterns detected'):data.patterns.map(function(p,i){return React.createElement('div',{key:i,className:'pattern-item'+(p.isAnti?' anti':'')},React.createElement('div',{className:'pattern-icon'},p.icon),React.createElement('div',{className:'pattern-info'},React.createElement('div',{className:'pattern-name'},p.name,p.isAnti&&React.createElement('span',{className:'badge badge-danger',style:{marginLeft:8}},'Anti-pattern')),React.createElement('div',{className:'pattern-desc'},p.desc),React.createElement('div',{className:'pattern-files'},p.files.slice(0,3).join(', '),p.files.length>3?' +'+(p.files.length-3):'')));})
+                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🧩 Design Patterns & Anti-Patterns'),
+                            data.patterns.length===0?React.createElement('div',{style:{textAlign:'center',padding:20,color:'var(--t3)'}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'🔍'),React.createElement('div',null,'No patterns detected'),React.createElement('div',{style:{fontSize:10,marginTop:8}},'Patterns are detected based on code structure')):
+                            data.patterns.map(function(p,i){return React.createElement('div',{key:i,className:'pattern-item'+(p.isAnti?' anti':'')},
+                                React.createElement('div',{className:'pattern-header'},
+                                    React.createElement('span',{className:'pattern-icon'},p.icon),
+                                    React.createElement('span',{className:'pattern-name'},p.name),
+                                    p.isAnti&&React.createElement('span',{className:'badge badge-danger',style:{marginLeft:8}},'Anti-pattern')
+                                ),
+                                React.createElement('div',{className:'pattern-desc'},p.desc),
+                                React.createElement('div',{className:'pattern-files'},
+                                    p.files.slice(0,5).map(function(f,j){return React.createElement('span',{key:j,className:'pattern-file',style:{cursor:'pointer'},onClick:function(){selectFile(f.path);}},f.name);})
+                                ),
+                                p.files.length>5&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginTop:4}},'+',p.files.length-5,' more files'),
+                                p.metrics&&React.createElement('div',{className:'pattern-metrics'},
+                                    Object.entries(p.metrics).map(function(e){return React.createElement('div',{key:e[0],className:'pattern-metric'},React.createElement('div',{className:'pattern-metric-value'},e[1]),React.createElement('div',{className:'pattern-metric-label'},e[0]));})
+                                )
+                            );})
                         ),
                         rightTab==='security'&&React.createElement(React.Fragment,null,
-                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🔐 Security (',data.securityIssues.length,')'),
-                            data.securityIssues.length===0?React.createElement('div',{style:{textAlign:'center',padding:20}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'✅'),React.createElement('div',{style:{color:'var(--green)'}},'No issues found')):data.securityIssues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+issue.severity,onClick:function(){selectFile(issue.path);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selectFile(issue.path);}}},React.createElement('div',{className:'security-title'},issue.severity==='high'?'🔴':issue.severity==='medium'?'🟡':'🔵',' ',issue.title),React.createElement('div',{className:'security-path'},issue.file));})
+                            React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🔐 Security Analysis'),
+                            data.securityIssues.length===0?React.createElement('div',{style:{textAlign:'center',padding:20}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'✅'),React.createElement('div',{style:{color:'var(--green)',fontWeight:600}},'No security issues found!'),React.createElement('div',{style:{fontSize:10,color:'var(--t3)',marginTop:8}},'Your code passed all security checks')):
+                            React.createElement(React.Fragment,null,
+                                React.createElement('div',{style:{display:'flex',gap:8,marginBottom:12}},
+                                    React.createElement('div',{className:'badge badge-danger'},data.securityIssues.filter(function(i){return i.severity==='high';}).length,' High'),
+                                    React.createElement('div',{className:'badge badge-warning'},data.securityIssues.filter(function(i){return i.severity==='medium';}).length,' Medium'),
+                                    React.createElement('div',{className:'badge badge-info'},data.securityIssues.filter(function(i){return i.severity==='low';}).length,' Low')
+                                ),
+                                data.securityIssues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+issue.severity,onClick:function(){selectFile(issue.path);}},
+                                    React.createElement('div',{className:'security-header'},
+                                        React.createElement('span',null,issue.severity==='high'?'🔴':issue.severity==='medium'?'🟡':'🔵'),
+                                        React.createElement('span',{className:'security-title'},issue.title)
+                                    ),
+                                    React.createElement('div',{className:'security-desc'},issue.desc),
+                                    React.createElement('div',{className:'security-path'},issue.file,issue.line?' : Line '+issue.line:''),
+                                    issue.code&&React.createElement('div',{className:'security-code'},issue.code)
+                                );})
+                            )
                         )
                     )
                 ):React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📊'),React.createElement('div',{className:'empty-title'},'Analysis'),React.createElement('div',{className:'empty-desc'},'Analyze a repo to see insights'))
@@ -950,8 +1085,8 @@ function App(){
                 React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'📤 Export'),React.createElement('button',{className:'modal-close',onClick:function(){setShowExport(false);}},'×')),
                 React.createElement('div',{className:'modal-body'},
                     React.createElement('div',{className:'export-options'},
-                        React.createElement('div',{className:'export-option',onClick:function(){exportSVG();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportSVG();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'🖼️'),React.createElement('div',{className:'export-option-label'},'SVG')),
-                        React.createElement('div',{className:'export-option',onClick:function(){exportJSON();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportJSON();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'📋'),React.createElement('div',{className:'export-option-label'},'JSON')),
+                        React.createElement('div',{className:'export-option',onClick:function(){exportSVG();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportSVG();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'🖼️'),React.createElement('div',{className:'export-option-label'},'SVG Image')),
+                        React.createElement('div',{className:'export-option',onClick:function(){exportJSON();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportJSON();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'📋'),React.createElement('div',{className:'export-option-label'},'JSON data')),
                         React.createElement('div',{className:'export-option',onClick:function(){copyLink();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();copyLink();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'🔗'),React.createElement('div',{className:'export-option-label'},'Share Link'))
                     )
                 )
@@ -959,33 +1094,53 @@ function App(){
         ),
         showPR&&React.createElement('div',{className:'modal-overlay',onClick:function(){setShowPR(false);}},
             React.createElement('div',{className:'modal',onClick:function(e){e.stopPropagation();}},
-                React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'📊 PR Analyzer'),React.createElement('button',{className:'modal-close',onClick:function(){setShowPR(false);}},'×')),
+                React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'📊 PR Impact Analyzer'),React.createElement('button',{className:'modal-close',onClick:function(){setShowPR(false);}},'×')),
                 React.createElement('div',{className:'modal-body'},
-                   React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'PR URL'),React.createElement('input',{className:'form-input','aria-label':'Pull Request URL',placeholder:'https://github.com/owner/repo/pull/123',value:prUrl,onChange:function(e){setPrUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')analyzePR();}})),
-                    React.createElement('button',{className:'top-btn primary','aria-label':'Analyze Pull Request',onClick:analyzePR,style:{marginBottom:16}},'Analyze'),
+                   React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Pull Request URL'),React.createElement('input',{className:'form-input','aria-label':'Pull Request URL',placeholder:'https://github.com/owner/repo/pull/123',value:prUrl,onChange:function(e){setPrUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')analyzePR();}})),
+                    React.createElement('button',{className:'top-btn primary','aria-label':'Analyze Pull Request',onClick:analyzePR,style:{marginBottom:16}},'🔍 Analyze Impact'),
                     prData&&React.createElement(React.Fragment,null,
-                        React.createElement('div',{className:'pr-header'},React.createElement('div',{className:'pr-title'},prData.title),React.createElement('div',{className:'pr-stats'},React.createElement('span',{className:'pr-add'},'+',prData.additions||0),React.createElement('span',{className:'pr-del'},'-',prData.deletions||0))),
-                        React.createElement('div',{style:{fontSize:11,fontWeight:600,marginBottom:8}},'Files (',prData.files?prData.files.length:0,')'),
-                        prData.files&&prData.files.slice(0,10).map(function(f,i){
+                        React.createElement('div',{className:'pr-header'},React.createElement('div',{className:'pr-title'},prData.title),React.createElement('div',{className:'pr-stats'},React.createElement('span',{className:'pr-add'},'+',prData.additions||0,' additions'),React.createElement('span',{className:'pr-del'},'-',prData.deletions||0,' deletions'))),
+                        React.createElement('div',{style:{fontSize:11,fontWeight:600,marginBottom:8}},'Impacted Files (',prData.files?prData.files.length:0,')'),
+                        prData.files&&prData.files.slice(0,15).map(function(f,i){
                             var existing=data&&data.files.find(function(df){return df.path===f.filename;});
                             var blast=existing?calcBlast(f.filename,data.connections,data.files):null;
-                            return React.createElement('div',{key:i,className:'pr-file'},React.createElement('span',{className:'pr-file-name'},f.filename.split('/').pop()),React.createElement('span',{className:'pr-file-impact',style:{background:blast?blast.level==='low'?'rgba(34,197,94,0.2)':blast.level==='medium'?'rgba(255,159,67,0.2)':'rgba(255,95,95,0.2)':'var(--bg3)',color:blast?blast.level==='low'?'var(--green)':blast.level==='medium'?'var(--orange)':'var(--red)':'var(--t3)'}},blast?blast.count+' affected':'new'));
+                            return React.createElement('div',{key:i,className:'pr-file'},React.createElement('span',{className:'pr-file-name',title:f.filename},f.filename),React.createElement('span',{className:'pr-file-impact',style:{background:blast?blast.level==='low'?'rgba(34,197,94,0.2)':blast.level==='medium'?'rgba(255,159,67,0.2)':'rgba(255,95,95,0.2)':'var(--bg3)',color:blast?blast.level==='low'?'var(--green)':blast.level==='medium'?'var(--orange)':'var(--red)':'var(--t3)'}},blast?blast.count+' affected':'new file'));
                         })
                     )
                 )
             )
         ),
-        showTour&&React.createElement('div',{className:'modal-overlay',onClick:function(){setShowTour(false);}},
-            React.createElement('div',{className:'modal',onClick:function(e){e.stopPropagation();}},
-                React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'🎓 Tour'),React.createElement('button',{className:'modal-close',onClick:function(){setShowTour(false);}},'×')),
+        showPrivacy&&React.createElement('div',{className:'modal-overlay',onClick:function(){setShowPrivacy(false);}},
+            React.createElement('div',{className:'modal privacy-modal',onClick:function(e){e.stopPropagation();}},
+                React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'🔒 Privacy & Security'),React.createElement('button',{className:'modal-close',onClick:function(){setShowPrivacy(false);}},'×')),
                 React.createElement('div',{className:'modal-body'},
-                    tour.length===0?React.createElement('div',{style:{textAlign:'center',padding:20,color:'var(--t3)'}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'🎓'),React.createElement('div',null,'No steps yet'),React.createElement('div',{style:{fontSize:10,marginTop:8}},'Select files and click "Add to Tour"')):tour.map(function(step,i){return React.createElement('div',{key:i,className:'tour-step'},React.createElement('div',{className:'tour-number'},i+1),React.createElement('div',{className:'tour-content'},React.createElement('div',{className:'tour-file',onClick:function(){selectFile(step.file);setShowTour(false);}},step.name),React.createElement('input',{className:'form-input',placeholder:'Note...',value:step.note,onChange:function(e){var t=tour.slice();t[i].note=e.target.value;setTour(t);},style:{marginTop:8}})),React.createElement('button',{className:'top-btn',onClick:function(){setTour(tour.filter(function(_,j){return j!==i;}));},style:{padding:'4px 8px'}},'×'));})
+                     React.createElement('div',{className:'privacy-item'},
+                        React.createElement('div',{className:'privacy-icon'},'🌐'),
+                        React.createElement('div',null,React.createElement('div',{className:'privacy-title'},'100% Browser-Based'),React.createElement('div',{className:'privacy-text'},'CodeFlow runs entirely in your browser. No backend servers, no data collection.'))
+                    ),
+                    React.createElement('div',{className:'privacy-item'},
+                        React.createElement('div',{className:'privacy-icon'},'🔑'),
+                        React.createElement('div',null,React.createElement('div',{className:'privacy-title'},'Your Token Stays Local'),React.createElement('div',{className:'privacy-text'},'Your GitHub token is stored only in your browser\'s memory. It\'s never saved, logged, or transmitted anywhere except directly to GitHub\'s API.'))
+                    ),
+                    React.createElement('div',{className:'privacy-item'},
+                        React.createElement('div',{className:'privacy-icon'},'📡'),
+                        React.createElement('div',null,React.createElement('div',{className:'privacy-title'},'Direct API Calls'),React.createElement('div',{className:'privacy-text'},'All GitHub API calls go directly from your browser to api.github.com. We have no proxy, no middleware, no way to intercept your data.'))
+                    ),
+                    React.createElement('div',{className:'privacy-item'},
+                        React.createElement('div',{className:'privacy-icon'},'🗑️'),
+                        React.createElement('div',null,React.createElement('div',{className:'privacy-title'},'Nothing Persisted'),React.createElement('div',{className:'privacy-text'},'Close the tab and everything is gone. No cookies, no local storage, no tracking. Check the source code - it\'s all in one HTML file!'))
+                    ),
+                    React.createElement('div',{style:{marginTop:16,padding:12,background:'var(--accbg)',borderRadius:8,fontSize:10,color:'var(--t1)'}},
+                        '💡 Tip: Create a ',React.createElement('a',{href:'https://github.com/settings/tokens',target:'_blank',rel:'noopener',style:{color:'var(--acc)'}},'Personal Access Token'),' with only "public_repo" scope for extra peace of mind when analyzing public repositories.'
+                    )
                 ),
-                tour.length>0&&React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'top-btn',onClick:function(){var b=new Blob([JSON.stringify(tour,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='tour.json';a.click();}},'Export'))
+                React.createElement('div',{className:'modal-footer'},
+                    React.createElement('button',{className:'top-btn primary',onClick:function(){setShowPrivacy(false);}},'Got it!')
+                )
             )
         ),
         toast&&React.createElement('div',{className:'toast '+(toast.type||'success'),'role':'alert'},toast.msg),
-        error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000},'role':'alert'},error,React.createElement('button',{'aria-label':'Dismiss error',onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer'}},'×'))
+       error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000,maxWidth:350},'role':'alert'},error,React.createElement('button',{'aria-label':'Dismiss error',onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer',fontSize:16}},'×'))
     );
 }
 
