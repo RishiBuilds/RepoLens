@@ -4,33 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RepoLens IQ — Codebase Intelligence Platform</title>
+    <meta name="description" content="Visualize any GitHub repository's codebase in seconds. Explore architecture, dependencies, blast radius, security issues, patterns, and ownership. Runs entirely in your browser with no installation.">
+    <meta name="keywords" content="repolens iq, codebase intelligence, code visualization, architecture, github repository analysis, dependency graph, blast radius, static code analysis, code health, developer tools">
+    <meta name="author" content="RepoLens IQ">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta property="og:title" content="RepoLens IQ — Codebase Intelligence Platform">
+    <meta property="og:description" content="Turn any GitHub repository into instant codebase intelligence. Visualize architecture, dependencies, blast radius, security issues, patterns, and ownership — all in your browser with no installation.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://raw.githubusercontent.com/RishiBuilds/RepoLens/main/og-image.png">
+    <meta property="og:image:alt" content="RepoLens IQ - Codebase Intelligence Platform">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RepoLens IQ — Codebase Intelligence Platform">
+    <meta name="twitter:description" content="Turn any GitHub repo into instant codebase intelligence. Visualize architecture, dependencies,blast radius, security issues, patterns, and ownership. Zero setup, privacy-first.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪬</text></svg>">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{--bg0:#0a0a0c; --bg1:#0e0e11; --bg2:#121214; --bg3:#16161a; --bg4:#1a1a1f; --hover:#1e1e24; --border:#1f1f26; --border2:#18181d; --t0:#e8e8ea; --t1:#c8c8cd; --t2:#8F8FA0; --t3:#5c5c66; --acc:#22d3ee; --acc2:#1ab8d4; --accbg:rgba(34, 211, 238, 0.1); --blue:#5aa2ff; --purple:#b197fc; --cyan:#22d3ee; --green:#22c55e; --orange:#ff9f43;--red:#ff5f5f; --pink:#ec4899}
+        :root{--bg0:#050507; --bg1:#08080a; --bg2:#0b0b0d; --bg3:#0e0e11; --bg4:#121214; --hover:#16161a; --border:#1a1a1f; --border2:#0f0f12; --t0:#e8e8ea; --t1:#c8c8cd; --t2:#8F8FA0; --t3:#5c5c66; --acc:#22d3ee; --acc2:#1ab8d4; --accbg:rgba(34, 211, 238, 0.1); --blue:#5aa2ff; --purple:#b197fc; --cyan:#22d3ee; --green:#22c55e; --orange:#ff9f43;--red:#ff5f5f; --pink:#ec4899}
         .light{--bg0:#ffffff; --bg1:#f8f9fb; --bg2:#f1f3f5; --bg3:#e8eaee; --bg4:#dde1e6; --hover:#e4e7ec; --border:#d9dde3; --border2:#eceff3; --t0:#121212; --t1:#2f2f2f; --t2:#5f5f5f; --t3:#8f8f8f; --acc:#00a86b; --acc2:#008f5b; --accbg:rgba(0, 168, 107, 0.1)}  
         *{margin:0; padding:0; box-sizing:border-box}
         body{font-family:'Source Code Pro', monospace; background: var(--bg0); color: var(--t0); height: 100vh; min-height: 100vh; margin: 0; overflow: hidden}
         .app{display:flex; height:100vh; flex-direction:column}
         .topbar{height:48px; min-height:48px; display:flex; background:var(--bg1); border-bottom:1px solid var(--border); align-items:center; padding:0 16px;  padding-inline: 16px; gap:16px; flex-shrink:0; box-sizing: border-box}
         .logo{display:inline-flex; align-items:center; gap:12px; line-height: 1}
-        .logo-mark{width:32px; height:32px; position:relative; display: flex; align-items: center; justify-content: center; background:#0a0a0c; border-radius:6px; border:1.5px solid rgba(34, 211, 238, 0.3); box-shadow: 0 0 20px rgba(34, 211, 238, 0.15), inset 0 1px 0 rgba(255,255,255,0.05)}
+        .logo-mark{width:32px; height:32px; position:relative; display: flex; align-items: center; justify-content: center; background:#030305; border-radius:6px; border:1.5px solid rgba(34, 211, 238, 0.3); box-shadow: 0 0 20px rgba(34, 211, 238, 0.15), inset 0 1px 0 rgba(255,255,255,0.05)}
         .logo-mark::before{content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 30%, rgba(34, 211, 238, 0.15), transparent 60%); border-radius:5px; pointer-events:none}
         .logo-icon{width:18px; height:18px; position:relative; z-index:1}
         .logo-icon svg{width:100%; height:100%; display:block}
         .logo-text{font-size:15px; font-weight:700; color:#22d3ee; letter-spacing:0.5px; text-transform:uppercase; text-shadow: 0 0 20px rgba(34, 211, 238, 0.3)}
-        .logo-tag{font-size:9px; color:#0a0a0c; background:#22d3ee; padding:3px 9px; border-radius:12px; font-weight:700; letter-spacing:0.5px; border:1px solid rgba(34, 211, 238, 0.5); box-shadow: 0 0 12px rgba(34, 211, 238, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)}
+        .logo-tag{font-size:10px; font-weight:600; color:#030305; background:var(--acc); padding:2px 6px; border-radius:4px; margin-left:6px; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 0 10px rgba(34, 211, 238, 0.4)}
         .repo-input-group{display:flex; gap:8px; flex:1 1 auto; max-width:500px}
         .repo-input{flex:1; padding:6px 12px; background:var(--bg0); border:1px solid var(--border); border-radius:6px; color:var(--t0); font-family:inherit; font-size:11px}
-        .repo-input:focus{outline:none; border-color:var(--acc)}
+        .repo-input:focus{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
         .topbar-actions{display:flex; gap:7px; margin-left:auto; flex-shrink: 0}
-        .top-btn{padding:6px 12px; background:var(--bg3); border:1px solid var(--border) ;border-radius:6px; color:var(--t1); font-family:inherit; font-size:11px; cursor:pointer; display:flex; display: inline-flex; align-items:center; gap:6px; white-space:nowrap}
+        .top-btn{padding:6px 12px; background:var(--bg3); border:1px solid var(--border) ;border-radius:6px; color:var(--t1); font-family:inherit; font-size:11px; cursor:pointer; display:flex; display: inline-flex; align-items:center; gap:6px; white-space:nowrap; transition:all 0.2s ease}
         .top-btn:hover{background:var(--bg4); border-color:var(--acc); color:var(--acc)}
-        .top-btn.primary{background:var(--acc); color:var(--bg0); border-color:var(--acc)}
+        .top-btn:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
+        .top-btn.primary{background:var(--acc); color:#030305; border-color:var(--acc)}
         .top-btn.primary:hover:not(:disabled){background-color: var(--acc2)}
+        .top-btn.primary:focus-visible{outline:2px solid var(--acc2); outline-offset:2px}
         .top-btn:disabled{opacity:0.5; cursor:not-allowed; pointer-events: none}
         .main{display:flex; flex:1; min-width: 0; overflow:hidden}
         .sidebar{width:260px; background:var(--bg1); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink: 0;}
@@ -41,8 +56,9 @@
         .sidebar-scroll::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px}
         .sidebar-scroll::-webkit-scrollbar-thumb:hover{background: var(--hover)}
         .view-modes{display:flex; flex-direction:column; gap:3px}
-        .view-mode{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:11px; color:var(--t1)}
+        .view-mode{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:11px; color:var(--t1); transition:all 0.2s ease}
         .view-mode:hover{background:var(--hover)}
+        .view-mode:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .view-mode.active{background:var(--accbg); color:var(--acc)}
         .view-mode-icon{font-size:13px}
         .view-mode-badge{margin-left:auto; font-size:8px; background:var(--red); color:white; padding:2px 6px; border-radius:7px}
@@ -59,24 +75,27 @@
         .health-info{flex:1; min-width:0}
         .health-grade{font-size:16px;font-weight:700; color:var(--acc)}
         .health-label{font-size:9px; color:var(--t3)}
-        .tree-folder{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:12px; color:var(--t1)}
+        .tree-folder{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:12px; color:var(--t1); transition:all 0.2s ease}
         .tree-folder:hover{background:var(--hover); color: var(--t0)}
+        .tree-folder:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .tree-toggle{width:12px; font-size:8px; color:var(--t3); transition:transform 0.15s ease}
         .tree-toggle.open{transform:rotate(90deg)}
         .tree-name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
         .tree-count{font-size:9px; color:var(--t3); background:var(--bg3); padding:2px 6px; border-radius:8px; line-height:1}
         .tree-children{margin-left:17px}
-        .tree-file{display:flex ;align-items:center; gap:6px; padding:4px 8px; margin-left:18px; border-radius:4px; cursor:pointer; font-size:11px; color:var(--t2)}
+        .tree-file{display:flex ;align-items:center; gap:6px; padding:4px 8px; margin-left:18px; border-radius:4px; cursor:pointer; font-size:11px; color:var(--t2); transition:all 0.2s ease}
         .tree-file:hover{background:var(--hover); color:var(--t0)}
+        .tree-file:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .tree-file.active{background:var(--accbg); color:var(--acc)}
         .canvas-area{flex:1; position:relative; background:radial-gradient(1200px 600px at 50% 0%,rgba(34, 211, 238, 0.03),var(--bg0)); overflow:hidden}
         .canvas-area svg{width:100%; height:100%; display:block}
         .canvas-toolbar{position:absolute; top:12px; left:12px; display:flex; gap:6px; border: 1px solid var(--border2); border-radius:8px; overflow:hidden; z-index:50}
-        .canvas-info{position:absolute; bottom:12px; left:12px; display:flex; background: rgba(10, 10, 12, 0.85); backdrop-filter: blur(8px); gap:8px; z-index:50; border-radius:8px; border:1px solid var(--border2)}
+        .canvas-info{position:absolute; bottom:12px; left:12px; display:flex; background: rgba(5, 5, 7, 0.9); backdrop-filter: blur(8px); gap:8px; z-index:50; border-radius:8px; border:1px solid var(--border2)}
         .info-chip{padding:6px 10px; background:var(--bg1); border:1px solid var(--border); border-radius:6px; font-size:10px; color:var(--t2)}
         .info-chip strong{color:var(--acc)}
-        .tool-btn{width:32px; height:32px; display: inline-flex; display:flex; align-items: center; justify-content: center; background:var(--bg1); border:1px solid var(--border); border-radius:7px; color:var(--t2); font-size:13px; cursor:pointer}
+        .tool-btn{width:32px; height:32px; display: inline-flex; display:flex; align-items: center; justify-content: center; background:var(--bg1); border:1px solid var(--border); border-radius:7px; color:var(--t2); font-size:13px; cursor:pointer; transition:all 0.2s ease}
         .tool-btn:hover{background:var(--bg2); color:var(--t0); border-color:var(--acc)}
+        .tool-btn:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
         .tool-btn:active{transform: translateX(1px)}
         .legend{position:absolute; top:12px; right:12px; background:var(--bg1); border:1px solid var(--border); border-radius:8px; padding:12px 14px; z-index:50; min-width: 140px;}
         .legend-title{font-size:9px; font-weight:600; color:var(--t3); text-transform:uppercase; margin-bottom:10px}
@@ -84,16 +103,18 @@
         .legend-color{width:12px; height:12px; border-radius:3px; flex-shrink:0; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset}
         .right-panel{width:340px; background:var(--bg1); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0}
         .panel-tabs{display:flex; border-bottom:1px solid var(--border); background:var(--bg2)}
-        .panel-tab{flex:1; padding:8px 10px; border: none; background:transparent; border-bottom:2px solid transparent; color:var(--t3); font-family:inherit; font-size:10px; font-weight:600; cursor:pointer}
+        .panel-tab{flex:1; padding:8px 10px; border: none; background:transparent; border-bottom:2px solid transparent; color:var(--t3); font-family:inherit; font-size:10px; font-weight:600; cursor:pointer; transition:all 0.2s ease}
         .panel-tab:hover{color:var(--t1)}
+        .panel-tab:focus-visible{outline:2px solid var(--acc); outline-offset:2px; color:var(--t1)}
         .panel-tab.active{color:var(--acc); border-bottom-color:var(--acc)}
         .panel-content{flex:1;overflow-y:auto;padding:13px}
         .panel-content::-webkit-scrollbar{width:6px}
         .panel-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
         .panel-content::-webkit-scrollbar-thumb:hover{background: var(--hover)}
         .card{background:var(--bg1); border:1px solid var(--border2); border-radius:9px; margin-bottom:9px; overflow:hidden}
-        .card-header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; cursor:pointer}
+        .card-header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; cursor:pointer; transition:all 0.2s ease}
         .card-header:hover{background:var(--hover)}
+        .card-header:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .card-title{font-size:12px; color:var(--t0); display:flex; align-items:center; gap:8px}
         .card-toggle{font-size:9px; color:var(--t3); transition:transform 0.15s ease, color 0.12s ease}
         .card-toggle.open{transform:rotate(90deg); color: var(--t1)}
@@ -122,29 +143,31 @@
         .pattern-name{font-size:11px; color:var(--t0); font-weight:500}
         .pattern-desc{font-size:9px; color:var(--t3); margin-top:2px}
         .pattern-files{font-size:9px; color:var(--t2); margin-top:5px}
-        .security-item{padding:10px 12px; background:var(--bg1); border-radius:7px; margin-bottom:7px; border-left:3px solid; cursor:pointer}
+        .security-item{padding:10px 12px; background:var(--bg1); border-radius:7px; margin-bottom:7px; border-left:3px solid; cursor:pointer; transition:all 0.2s ease}
         .security-item:hover{background:var(--hover)}
+        .security-item:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .security-item.high{border-color:var(--red)}
         .security-item.medium{border-color:var(--orange)}
         .security-item.low{border-color:var(--blue)}
         .security-title{font-size:12px; color:var(--t0)}
         .security-path{font-size:10px; color:var(--t3); margin-top:4px}
         .tour-step{display:flex; gap:12px; padding:12px; background:var(--bg1); border-radius:8px; margin-bottom:8px}
-        .tour-number{width:24px; height:24px; background:var(--acc); color:var(--bg0); border-radius:50%; display:flex; display: inline-flex;align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0}
+        .tour-number{width:24px; height:24px; background:var(--acc); color:#030305; border-radius:50%; display:flex; display: inline-flex;align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0}
         .tour-content{flex:1}
         .tour-file{font-size:12px; color:var(--acc); cursor:pointer}
-        .modal-overlay{position:fixed; inset:0; background:rgba(10, 10, 12, 0.75); backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000}
+        .modal-overlay{position:fixed; inset:0; background:rgba(5, 5, 7, 0.85); backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000}
         .modal{background:var(--bg1); border:1px solid var(--border2); border-radius:12px; width:90%; max-width:520px; max-height:80vh; overflow:hidden; display:flex; flex-direction:column}
         .modal-header{padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between}
         .modal-title{font-size:14px; font-weight:600; color:var(--t0)}
-        .modal-close{background:none; border:none; color:var(--t3); font-size:18px; cursor:pointer}
+        .modal-close{background:none; border:none; color:var(--t3); font-size:18px; cursor:pointer; border-radius:4px; padding:4px; transition:all 0.2s ease}
         .modal-close:hover{background: var(--hover); color: var(--t0)}
+        .modal-close:focus-visible{outline:2px solid var(--acc); outline-offset:2px; background:var(--hover)}
         .modal-body{flex:1; overflow-y:auto; padding:16px; color: var(--t1)}
         .modal-footer{padding:16px; border-top:1px solid var(--border2); display:flex; justify-content:flex-end; gap:8px}
         .form-group{margin-bottom:13px}
         .form-label{display:block; font-size:10px; color:var(--t2); margin-bottom:6px}
-        .form-input{width:100%; padding:8px 11px; background:var(--bg0); border:1px solid var(--border2); border-radius:6px; color:var(--t0); font-family:inherit; font-size:11px}
-        .form-input:focus{outline:none; border-color:var(--acc)}
+        .form-input{width:100%; padding:8px 11px; background:var(--bg0); border:1px solid var(--border2); border-radius:6px; color:var(--t0); font-family:inherit; font-size:11px; transition:all 0.2s ease}
+        .form-input:focus{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc)}
         .empty-state{display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:40px 20px}
         .empty-icon{font-size:44px;margin-bottom:16px;opacity:0.35; color: var(--t3)}
         .empty-title{font-size:15px; font-weight:600; color:var(--t1); margin-bottom:6px}
@@ -158,8 +181,9 @@
         .tooltip-title{font-size:11px; font-weight:600; color:var(--acc)}
         .tooltip-content{font-size:10px; color:var(--t2); margin-top:4px; white-space:pre-line}
         .export-options{display:grid; grid-template-columns:repeat(2,minmax(0, 1fr)); gap:8px}
-        .export-option{padding:16px 12px; background:var(--bg1); border:1px solid var(--border2); border-radius:8px; cursor:pointer; text-align:center}
+        .export-option{padding:16px 12px; background:var(--bg1); border:1px solid var(--border2); border-radius:8px; cursor:pointer; text-align:center; transition:all 0.2s ease}
         .export-option:hover{border-color:var(--acc); background:var(--accbg)}
+        .export-option:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-color:var(--acc); background:var(--accbg)}
         .export-option-icon{font-size:22px; margin-bottom:8px}
         .export-option-label{font-size:11px; font-weight: 600; color:var(--t1)}
         .pr-header{padding:12px 14px; background:var(--bg1); border-radius:9px; margin-bottom:12px}
@@ -173,6 +197,15 @@
         .panel-header{padding:12px 14px; border-bottom:1px solid var(--border2); background:var(--bg2)}
         .panel-title{font-size:12px; font-weight:600; color:var(--acc)}
         .panel-subtitle{font-size:10px; color:var(--t3); margin-top:4px}
+        .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:9px; font-size:12px; z-index:1001; animation:toast-slide-up 0.25s ease}
+        .toast.success{background:var(--green); color:white}
+        .toast.error{background:var(--red); color:white}
+        .toast.warning{background:var(--orange); color:var(--bg0)}
+        @keyframes toast-slide-up{from{opacity:0; transform:translateX(-50%) translateY(16px)}to{opacity:1; transform:translateX(-50%) translateY(0)}}
+        .reset-btn{background:transparent; border:1px solid var(--border2); color:var(--t2); padding:4px 8px; border-radius:4px; font-size:9px; cursor:pointer; margin-left:8px}
+        .reset-btn:hover{border-color:var(--red); color:var(--red)}
+        .loading-owner{display:flex; align-items:center; gap:8px; padding:12px;color:var(--t2); font-size:10px}
+        .loading-owner::before{content:''; width:14px; height:14px; border:2px solid var(--border2); border-top-color:var(--acc); border-radius:50%; animation:spin 0.6s linear infinite}
     </style>   
 </head>
 <body>
@@ -264,12 +297,77 @@ const Parser={
 
 var GitHub={
     token:null,
-    fetch:function(url){
-        var h={'Accept':'application/vnd.github.v3+json'};
-        if(this.token)h['Authorization']='Bearer '+this.token;
-        return fetch(url,{headers:h}).then(function(r){
-            if(!r.ok)throw new Error(r.status===401?'Invalid token':r.status===403?'Rate limited':r.status===404?'Not found':'Error '+r.status);
-            return r.json();
+    lastRequestTime:0,
+    minDelay:100,
+    retryCount:0,
+    maxRetries:3,
+    rateLimitReset:null,
+    fetch:function(url,retryAttempt){
+        var self=this;
+        retryAttempt=retryAttempt||0;
+        return new Promise(function(resolve,reject){
+            var now=Date.now();
+            var timeSinceLastRequest=now-self.lastRequestTime;
+            var delay=Math.max(0,self.minDelay-timeSinceLastRequest);
+            setTimeout(function(){
+                self.lastRequestTime=Date.now();
+                var h={'Accept':'application/vnd.github.v3+json'};
+                if(self.token)h['Authorization']='Bearer '+self.token;
+                fetch(url,{headers:h}).then(function(r){
+                    var remaining=r.headers.get('X-RateLimit-Remaining');
+                    var resetTime=r.headers.get('X-RateLimit-Reset');
+                    if(resetTime)self.rateLimitReset=parseInt(resetTime)*1000;
+                    if(!r.ok){
+                        if(r.status===429||(r.status===403&&remaining==='0')){
+                            var resetDate=self.rateLimitReset?new Date(self.rateLimitReset):null;
+                            var resetStr=resetDate?resetDate.toLocaleTimeString():'soon';
+                            var waitTime=resetDate?Math.max(0,resetDate.getTime()-Date.now()):60000;
+                            if(retryAttempt<self.maxRetries&&waitTime<300000){
+                                setTimeout(function(){
+                                    self.minDelay=Math.min(2000,self.minDelay*2);
+                                    resolve(self.fetch(url,retryAttempt+1));
+                                },Math.min(waitTime,60000));
+                                return;
+                            }
+                            throw new Error('Rate limit exceeded. Limit resets at '+resetStr+'. Add a GitHub token for 5,000 requests/hour.');
+                        }
+                        if(r.status===403){
+                            var errorMsg='Access denied (403). ';
+                            if(!self.token){
+                                errorMsg+='This repository may be private or requires authentication. Please add a GitHub Personal Access Token with "repo" scope.';
+                            }else{
+                                errorMsg+='Your token may not have the required permissions. Ensure your GitHub Personal Access Token has "repo" scope for private repositories.';
+                            }
+                            errorMsg+=' Create a token at: https://github.com/settings/tokens';
+                            throw new Error(errorMsg);
+                        }
+                        if(r.status===401)throw new Error('Invalid or expired GitHub token. Please check your token.');
+                        if(r.status===404)throw new Error('Repository not found. Check the owner/repo name.');
+                        throw new Error('GitHub API error: '+r.status+' '+r.statusText);
+                    }
+                    if(remaining&&parseInt(remaining)<10){
+                        self.minDelay=Math.min(500,self.minDelay*1.5);
+                    }else if(remaining&&parseInt(remaining)>100){
+                        self.minDelay=Math.max(100,self.minDelay*0.9);
+                    }
+                    resolve(r.json());
+                }).catch(function(e){
+                    if(e.message&&!e.message.includes('Rate limit')){
+                        if(retryAttempt<self.maxRetries){
+                            setTimeout(function(){
+                                resolve(self.fetch(url,retryAttempt+1));
+                            },Math.pow(2,retryAttempt)*1000);
+                            return;
+                        }
+                    }
+                    if(e.message)reject(e);
+                    if(e.name==='TypeError'&&e.message.includes('Failed to fetch')){
+                        reject(new Error('Network error. Check your internet connection or CORS settings.'));
+                        return;
+                    }
+                    reject(new Error('Failed to fetch from GitHub API: '+e.message));
+                });
+            },delay);
         });
     },
     getFile:function(o,r,p){
@@ -298,16 +396,47 @@ var GitHub={
         if(d>10)return Promise.resolve([]);
         return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/contents/'+p).then(function(c){
             var f=[];
-            var promises=[];
+            var dirs=c.filter(function(i){return i.type==='dir'&&!IGNORE.has(i.name);});
             c.forEach(function(i){
                 if(i.type==='file'&&Parser.isCode(i.name))f.push({path:i.path,name:i.name,folder:i.path.includes('/')?i.path.substring(0,i.path.lastIndexOf('/')):'',size:i.size});
-                else if(i.type==='dir'&&!IGNORE.has(i.name)){if(cb)cb('/'+i.path);promises.push(self.scan(o,r,cb,i.path,d+1).catch(function(){return[];}));}
             });
-            return Promise.all(promises).then(function(results){
-                results.forEach(function(res){f=f.concat(res);});
-                return f;
+            if(dirs.length===0)return Promise.resolve(f);
+            return new Promise(function(resolve,reject){
+                var results=[];
+                var completed=0;
+                var hasError=false;
+                dirs.forEach(function(dir,idx){
+                    setTimeout(function(){
+                        if(hasError)return;
+                        if(cb)cb('/'+dir.path);
+                        self.scan(o,r,cb,dir.path,d+1).then(function(res){
+                            if(hasError)return;
+                            results.push(res);
+                            completed++;
+                            if(completed===dirs.length){
+                                results.forEach(function(res){f=f.concat(res);});
+                                resolve(f);
+                            }
+                        }).catch(function(e){
+                            if(hasError)return;
+                            if(e.message&&(e.message.includes('403')||e.message.includes('Access denied')||e.message.includes('401'))){
+                                hasError=true;
+                                reject(e);
+                                return;
+                            }
+                            completed++;
+                            if(completed===dirs.length){
+                                results.forEach(function(res){f=f.concat(res);});
+                                resolve(f);
+                            }
+                        });
+                    },idx*50);
+                });
             });
-        }).catch(function(e){if(d===0)throw e;return[];});
+        }).catch(function(e){
+            if(d===0||(e.message&&(e.message.includes('403')||e.message.includes('Access denied')||e.message.includes('401'))))throw e;
+            return[];
+        });
     }
 };
 
@@ -353,13 +482,13 @@ function calcBlast(fileId,conns,files){
 function calcHealth(data){
     if(!data)return{score:0,grade:'F'};
     var score=100;
-    var deadPct=data.stats.dead/data.stats.functions*100;
+    var deadPct=data.stats.functions>0?(data.stats.dead/data.stats.functions*100):0;
     score-=Math.min(20,deadPct);
     var circular=data.issues.filter(function(i){return i.title.includes('Circular');}).length;
     score-=Math.min(20,circular*5);
     var god=data.issues.filter(function(i){return i.title.includes('Large');}).length;
     score-=Math.min(15,god*3);
-    var avgCoup=data.stats.connections/data.stats.files;
+    var avgCoup=data.stats.files>0?(data.stats.connections/data.stats.files):0;
     score-=Math.min(15,Math.max(0,avgCoup-3)*2);
     var sec=data.securityIssues?data.securityIssues.filter(function(i){return i.severity==='high';}).length:0;
     score-=Math.min(20,sec*5);
@@ -374,7 +503,7 @@ function TreeNode(props){
     var isOpen=expanded.has(node.path);
     var children=Object.values(node.children).sort(function(a,b){return a.name.localeCompare(b.name);});
     return React.createElement('div',null,
-        React.createElement('div',{className:'tree-folder',onClick:function(){toggle(node.path);}},
+        React.createElement('div',{className:'tree-folder',onClick:function(){toggle(node.path);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(node.path);}}},
             React.createElement('span',{className:'tree-toggle'+(isOpen?' open':'')},children.length>0||node.files.length>0?'▶':''),
             React.createElement('span',null,isOpen?'📂':'📁'),
             React.createElement('span',{className:'tree-name'},node.name),
@@ -424,6 +553,8 @@ function App(){
     var _t=useState(false),showPR=_t[0],setShowPR=_t[1];
     var _u=useState(false),showTour=_u[0],setShowTour=_u[1];
     var _v=useState(null),tooltip=_v[0],setTooltip=_v[1];
+    var _w=useState(null),toast=_w[0],setToast=_w[1];
+    var _x=useState(false),ownerLoading=_x[0],setOwnerLoading=_x[1];
     var svgRef=useRef(null);
     var zoomRef=useRef(null);
     var simRef=useRef(null);
@@ -441,14 +572,15 @@ function App(){
 
     function analyze(){
         var p=parseUrl(repoUrl);
-        if(!p){setError('Invalid URL');return;}
-        setError(null);setData(null);setSelected(null);setLoading(true);setProgress('Scanning...');
+        if(!p){setError('Invalid URL. Use format: owner/repo or https://github.com/owner/repo');return;}
+        setError(null);setData(null);setSelected(null);setLoading(true);setProgress('Checking repository access...');
         GitHub.token=token||null;
         setRepoInfo(p);
         
         GitHub.scan(p.owner,p.repo,setProgress).then(function(files){
-            if(!files.length)throw new Error('No code files');
+            if(!files.length)throw new Error('No code files found. The repository may be empty or inaccessible.');
             var max=Math.min(files.length,100);
+            if(files.length>100)setError('Found '+files.length+' files. Analyzing first 100 for performance.');
             var analyzed=[];
             var allFns=[];
             
@@ -459,15 +591,27 @@ function App(){
                 }
                 var f=files[i];
                 setProgress((i+1)+'/'+max+': '+f.name);
-                GitHub.getFile(p.owner,p.repo,f.path).then(function(content){
+                Promise.all([
+                    GitHub.getFile(p.owner,p.repo,f.path),
+                    GitHub.getCommits(p.owner,p.repo,f.path,10).catch(function(){return[];})
+                ]).then(function(results){
+                    var content=results[0];
+                    var commits=results[1];
                     if(content){
                         var fns=Parser.extract(content,f.path);
                         var layer=Parser.detectLayer(f.path);
-                        analyzed.push({path:f.path,name:f.name,folder:f.folder,content:content,functions:fns,lines:content.split('\n').length,layer:layer,churn:Math.floor(Math.random()*10)});
+                        analyzed.push({path:f.path,name:f.name,folder:f.folder,content:content,functions:fns,lines:content.split('\n').length,layer:layer,churn:Array.isArray(commits)?commits.length:0});
                         fns.forEach(function(fn){allFns.push(Object.assign({},fn,{folder:f.folder,layer:layer}));});
                     }
-                    processFile(i+1);
-                }).catch(function(){processFile(i+1);});
+                    setTimeout(function(){processFile(i+1);},150);
+                }).catch(function(e){
+                    if(e.message&&(e.message.includes('Rate limit')||e.message.includes('403')||e.message.includes('Access denied'))){
+                        setError(e.message);
+                        setLoading(false);
+                        return;
+                    }
+                    setTimeout(function(){processFile(i+1);},150);
+                });
             }
             
             function finishAnalysis(){
@@ -515,7 +659,20 @@ function App(){
             }
             
             processFile(0);
-        }).catch(function(e){setError(e.message);setLoading(false);});
+        }).catch(function(e){
+            var errorMsg=e.message||'Unknown error occurred';
+            if(errorMsg.includes('403')||errorMsg.includes('Access denied')){
+                if(!errorMsg.includes('github.com/settings/tokens')){
+                    errorMsg+=' Learn more: https://github.com/settings/tokens';
+                }
+            }else if(errorMsg.includes('Rate limit')){
+                if(!errorMsg.includes('github.com/settings/tokens')){
+                    errorMsg+=' Learn more: https://github.com/settings/tokens';
+                }
+            }
+            setError(errorMsg);
+            setLoading(false);
+        });
     }
 
     var selectFile=useCallback(function(path){
@@ -526,7 +683,11 @@ function App(){
             setRightTab('details');
             var blast=calcBlast(path,data.connections,data.files);
             setBlastRadius(blast);
-            if(repoInfo)GitHub.getBlame(repoInfo.owner,repoInfo.repo,path).then(setOwnership);
+            setOwnership(null);
+            if(repoInfo){
+                setOwnerLoading(true);
+                GitHub.getBlame(repoInfo.owner,repoInfo.repo,path).then(function(owners){setOwnership(owners);setOwnerLoading(false);}).catch(function(){setOwnerLoading(false);});
+            }
         }
     },[data,repoInfo]);
 
@@ -634,11 +795,13 @@ function App(){
         var scale=0.8/Math.max((maxX-minX+100)/w,(maxY-minY+100)/h);
         d3.select(svgRef.current).transition().duration(400).call(zoomRef.current.transform,d3.zoomIdentity.translate(w/2-scale*(minX+maxX)/2,h/2-scale*(minY+maxY)/2).scale(Math.min(scale,2)));
     }
-    function exportSVG(){if(!svgRef.current)return;var blob=new Blob([new XMLSerializer().serializeToString(svgRef.current)],{type:'image/svg+xml'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens.svg';a.click();}
+    function exportSVG(){if(!svgRef.current)return;var svgClone=svgRef.current.cloneNode(true);svgClone.setAttribute('xmlns','http://www.w3.org/2000/svg');svgClone.setAttribute('width',svgRef.current.clientWidth);svgClone.setAttribute('height',svgRef.current.clientHeight);var style=document.createElementNS('http://www.w3.org/2000/svg','style');style.textContent='text{font-family:Source Code Pro Mono,monospace;pointer-events:none}';svgClone.insertBefore(style,svgClone.firstChild);var blob=new Blob([new XMLSerializer().serializeToString(svgClone)],{type:'image/svg+xml'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens-'+Date.now()+'.svg';a.click();URL.revokeObjectURL(url);}
     function exportJSON(){if(!data)return;var blob=new Blob([JSON.stringify({stats:data.stats,files:data.files.map(function(f){return{path:f.path,fns:f.functions.length,layer:f.layer};}),connections:data.connections,issues:data.issues},null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='repolens.json';a.click();}
-    function copyLink(){navigator.clipboard.writeText(window.location.href);alert('Link copied!');}
+    function showNotification(msg,type){setToast({msg:msg,type:type||'success'});setTimeout(function(){setToast(null);},3000);}
+    function copyLink(){navigator.clipboard.writeText(window.location.href).then(function(){showNotification('Link copied to clipboard!');}).catch(function(){showNotification('Failed to copy link','error');});}
     function analyzePR(){if(!prUrl||!repoInfo)return;var m=prUrl.match(/\/pull\/(\d+)/);if(!m){alert('Invalid PR URL');return;}GitHub.getPR(repoInfo.owner,repoInfo.repo,m[1]).then(setPrData);}
     function addToTour(f){setTour(function(prev){return prev.concat([{file:f.path,name:f.name,note:''}]);});}
+    function resetAnalysis(){setData(null);setSelected(null);setBlastRadius(null);setOwnership(null);setRepoInfo(null);setRepoUrl('');setPrData(null);setTour([]);window.history.replaceState({},'',window.location.pathname);}
     var health=useMemo(function(){return calcHealth(data);},[data]);
 
     return React.createElement('div',{className:'app'},
@@ -651,16 +814,17 @@ function App(){
                 React.createElement('span',{className:'logo-tag'},'IQ')
             ),
             React.createElement('div',{className:'repo-input-group'},
-                React.createElement('input',{className:'repo-input',placeholder:'owner/repo or GitHub URL',value:repoUrl,onChange:function(e){setRepoUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')analyze();}}),
-                React.createElement('input',{className:'repo-input',type:'password',placeholder:'Token',value:token,onChange:function(e){setToken(e.target.value);},style:{maxWidth:100}}),
-                React.createElement('button',{id:'analyze-btn',className:'top-btn primary',onClick:analyze,disabled:loading||!repoUrl},loading?'⏳':'🔍',' Analyze')
+                React.createElement('input',{className:'repo-input','aria-label':'Repository URL',placeholder:'owner/repo or GitHub URL',value:repoUrl,onChange:function(e){setRepoUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter'&&!loading)analyze();}}),
+                React.createElement('input',{className:'repo-input',type:'password','aria-label':'GitHub Token',placeholder:'Token (optional)',value:token,onChange:function(e){setToken(e.target.value);},onKeyDown:function(e){if(e.key==='Enter'&&!loading)analyze();},style:{maxWidth:120}}),
+                React.createElement('button',{id:'analyze-btn',className:'top-btn primary','aria-label':'Analyze repository',onClick:analyze,disabled:loading||!repoUrl},loading?'⏳':'🔍',' Analyze'),
+                data&&React.createElement('button',{className:'reset-btn','aria-label':'Reset analysis',onClick:resetAnalysis,title:'Clear & Reset'},'✕ Reset')
             ),
             React.createElement('div',{className:'topbar-actions'},
-                React.createElement('button',{className:'top-btn',onClick:function(){setShowPR(true);},disabled:!data},'📊 PR'),
-                React.createElement('button',{className:'top-btn',onClick:function(){setShowTour(true);},disabled:!data},'🎓 Tour'),
-                React.createElement('button',{className:'top-btn',onClick:function(){setShowExport(true);},disabled:!data},'📤'),
-                React.createElement('button',{className:'top-btn',onClick:copyLink,disabled:!data},'🔗'),
-                React.createElement('button',{className:'top-btn',onClick:function(){setTheme(function(t){return t==='dark'?'light':'dark';});}},theme==='dark'?'☀️':'🌙')
+               React.createElement('button',{className:'top-btn','aria-label':'Analyze Pull Request',onClick:function(){setShowPR(true);},disabled:!data},'📊 PR'),
+                React.createElement('button',{className:'top-btn','aria-label':'Create guided tour',onClick:function(){setShowTour(true);},disabled:!data},'🎓 Tour'),
+                React.createElement('button',{className:'top-btn','aria-label':'Export analysis',onClick:function(){setShowExport(true);},disabled:!data},'📤'),
+                React.createElement('button',{className:'top-btn','aria-label':'Copy share link',onClick:copyLink,disabled:!data},'🔗'),
+                React.createElement('button',{className:'top-btn','aria-label':'Toggle theme',onClick:function(){setTheme(function(t){return t==='dark'?'light':'dark';});}},theme==='dark'?'☀️':'🌙')
             )
         ),
         React.createElement('div',{className:'main'},
@@ -678,10 +842,10 @@ function App(){
                     React.createElement('div',{className:'sidebar-section'},
                         React.createElement('div',{className:'sidebar-title'},'Color By'),
                         React.createElement('div',{className:'view-modes'},
-                            React.createElement('div',{className:'view-mode'+(colorMode==='folder'?' active':''),onClick:function(){setColorMode('folder');}},React.createElement('span',{className:'view-mode-icon'},'📁'),'Folder'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='layer'?' active':''),onClick:function(){setColorMode('layer');}},React.createElement('span',{className:'view-mode-icon'},'🏗️'),'Layer'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='churn'?' active':''),onClick:function(){setColorMode('churn');}},React.createElement('span',{className:'view-mode-icon'},'🔥'),'Churn'),
-                            React.createElement('div',{className:'view-mode'+(colorMode==='blast'?' active':''),onClick:function(){setColorMode('blast');},style:{opacity:selected?1:0.5}},React.createElement('span',{className:'view-mode-icon'},'💥'),'Blast')
+                            React.createElement('div',{className:'view-mode'+(colorMode==='folder'?' active':''),onClick:function(){setColorMode('folder');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('folder');}}},React.createElement('span',{className:'view-mode-icon'},'📁'),'Folder'),
+                            React.createElement('div',{className:'view-mode'+(colorMode==='layer'?' active':''),onClick:function(){setColorMode('layer');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('layer');}}},React.createElement('span',{className:'view-mode-icon'},'🏗️'),'Layer'),
+                            React.createElement('div',{className:'view-mode'+(colorMode==='churn'?' active':''),onClick:function(){setColorMode('churn');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setColorMode('churn');}}},React.createElement('span',{className:'view-mode-icon'},'🔥'),'Churn'),
+                            React.createElement('div',{className:'view-mode'+(colorMode==='blast'?' active':''),onClick:function(){setColorMode('blast');},style:{opacity:selected?1:0.5},role:'button',tabIndex:selected?0:-1,onKeyDown:function(e){if((e.key==='Enter'||e.key===' ')&&selected){e.preventDefault();setColorMode('blast');}}},React.createElement('span',{className:'view-mode-icon'},'💥'),'Blast')
                         )
                     ),
                     React.createElement('div',{className:'sidebar-section'},
@@ -739,14 +903,14 @@ function App(){
                                 )
                             ),
                             ownership&&ownership.length>0&&React.createElement('div',{className:'card',style:{marginBottom:12}},
-                                React.createElement('div',{className:'card-header',onClick:function(){toggleCard('own');}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('own')?' open':'')},'▶'),'👥 Ownership')),
+                                React.createElement('div',{className:'card-header',onClick:function(){toggleCard('own');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCard('own');}}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('own')?' open':'')},'▶'),'👥 Ownership')),
                                 expandedCards.has('own')&&React.createElement('div',{className:'card-body'},
                                     React.createElement('div',{className:'owner-bar'},ownership.slice(0,5).map(function(o,i){return React.createElement('div',{key:i,className:'owner-segment',style:{width:o.percent+'%',background:COLORS[i%COLORS.length]}});})),
                                     React.createElement('div',{className:'owner-list'},ownership.slice(0,5).map(function(o,i){return React.createElement('div',{key:i,className:'owner-item'},React.createElement('div',{className:'owner-avatar',style:{background:COLORS[i%COLORS.length]}},o.name[0]),React.createElement('span',{className:'owner-name'},o.name),React.createElement('span',{className:'owner-percent'},o.percent,'%'));}))
                                 )
                             ),
                             React.createElement('div',{className:'card'},
-                                React.createElement('div',{className:'card-header',onClick:function(){toggleCard('fns');}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('fns')?' open':'')},'▶'),'⚡ Functions (',selected.functions.length,')')),
+                                React.createElement('div',{className:'card-header',onClick:function(){toggleCard('fns');},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCard('fns');}}},React.createElement('div',{className:'card-title'},React.createElement('span',{className:'card-toggle'+(expandedCards.has('fns')?' open':'')},'▶'),'⚡ Functions (',selected.functions.length,')')),
                                 expandedCards.has('fns')&&React.createElement('div',{className:'card-body'},
                                     selected.functions.slice(0,8).map(function(fn){var st=data.fnStats[fn.name];return React.createElement('div',{key:fn.name,style:{marginBottom:6,padding:6,background:'var(--bg0)',borderRadius:4}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between'}},React.createElement('span',{style:{color:'var(--cyan)',fontSize:10}},fn.name,'()'),React.createElement('span',{className:'badge '+(st&&st.count>10?'badge-danger':st&&st.count>0?'badge-warning':'badge-default')},st?st.count:0,'×')));}),
                                     selected.functions.length>8&&React.createElement('div',{style:{fontSize:9,color:'var(--t3)',textAlign:'center'}},'+',selected.functions.length-8,' more')
@@ -763,7 +927,7 @@ function App(){
                         ),
                         rightTab==='security'&&React.createElement(React.Fragment,null,
                             React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'🔐 Security (',data.securityIssues.length,')'),
-                            data.securityIssues.length===0?React.createElement('div',{style:{textAlign:'center',padding:20}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'✅'),React.createElement('div',{style:{color:'var(--green)'}},'No issues found')):data.securityIssues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+issue.severity,onClick:function(){selectFile(issue.path);}},React.createElement('div',{className:'security-title'},issue.severity==='high'?'🔴':issue.severity==='medium'?'🟡':'🔵',' ',issue.title),React.createElement('div',{className:'security-path'},issue.file));})
+                            data.securityIssues.length===0?React.createElement('div',{style:{textAlign:'center',padding:20}},React.createElement('div',{style:{fontSize:32,marginBottom:8}},'✅'),React.createElement('div',{style:{color:'var(--green)'}},'No issues found')):data.securityIssues.map(function(issue,i){return React.createElement('div',{key:i,className:'security-item '+issue.severity,onClick:function(){selectFile(issue.path);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selectFile(issue.path);}}},React.createElement('div',{className:'security-title'},issue.severity==='high'?'🔴':issue.severity==='medium'?'🟡':'🔵',' ',issue.title),React.createElement('div',{className:'security-path'},issue.file));})
                         )
                     )
                 ):React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📊'),React.createElement('div',{className:'empty-title'},'Analysis'),React.createElement('div',{className:'empty-desc'},'Analyze a repo to see insights'))
@@ -774,9 +938,9 @@ function App(){
                 React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'📤 Export'),React.createElement('button',{className:'modal-close',onClick:function(){setShowExport(false);}},'×')),
                 React.createElement('div',{className:'modal-body'},
                     React.createElement('div',{className:'export-options'},
-                        React.createElement('div',{className:'export-option',onClick:function(){exportSVG();setShowExport(false);}},React.createElement('div',{className:'export-option-icon'},'🖼️'),React.createElement('div',{className:'export-option-label'},'SVG')),
-                        React.createElement('div',{className:'export-option',onClick:function(){exportJSON();setShowExport(false);}},React.createElement('div',{className:'export-option-icon'},'📋'),React.createElement('div',{className:'export-option-label'},'JSON')),
-                        React.createElement('div',{className:'export-option',onClick:function(){copyLink();setShowExport(false);}},React.createElement('div',{className:'export-option-icon'},'🔗'),React.createElement('div',{className:'export-option-label'},'Share Link'))
+                        React.createElement('div',{className:'export-option',onClick:function(){exportSVG();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportSVG();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'🖼️'),React.createElement('div',{className:'export-option-label'},'SVG')),
+                        React.createElement('div',{className:'export-option',onClick:function(){exportJSON();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();exportJSON();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'📋'),React.createElement('div',{className:'export-option-label'},'JSON')),
+                        React.createElement('div',{className:'export-option',onClick:function(){copyLink();setShowExport(false);},role:'button',tabIndex:0,onKeyDown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();copyLink();setShowExport(false);}}},React.createElement('div',{className:'export-option-icon'},'🔗'),React.createElement('div',{className:'export-option-label'},'Share Link'))
                     )
                 )
             )
@@ -785,8 +949,8 @@ function App(){
             React.createElement('div',{className:'modal',onClick:function(e){e.stopPropagation();}},
                 React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'📊 PR Analyzer'),React.createElement('button',{className:'modal-close',onClick:function(){setShowPR(false);}},'×')),
                 React.createElement('div',{className:'modal-body'},
-                    React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'PR URL'),React.createElement('input',{className:'form-input',placeholder:'https://github.com/owner/repo/pull/123',value:prUrl,onChange:function(e){setPrUrl(e.target.value);}})),
-                    React.createElement('button',{className:'top-btn primary',onClick:analyzePR,style:{marginBottom:16}},'Analyze'),
+                   React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'PR URL'),React.createElement('input',{className:'form-input','aria-label':'Pull Request URL',placeholder:'https://github.com/owner/repo/pull/123',value:prUrl,onChange:function(e){setPrUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter')analyzePR();}})),
+                    React.createElement('button',{className:'top-btn primary','aria-label':'Analyze Pull Request',onClick:analyzePR,style:{marginBottom:16}},'Analyze'),
                     prData&&React.createElement(React.Fragment,null,
                         React.createElement('div',{className:'pr-header'},React.createElement('div',{className:'pr-title'},prData.title),React.createElement('div',{className:'pr-stats'},React.createElement('span',{className:'pr-add'},'+',prData.additions||0),React.createElement('span',{className:'pr-del'},'-',prData.deletions||0))),
                         React.createElement('div',{style:{fontSize:11,fontWeight:600,marginBottom:8}},'Files (',prData.files?prData.files.length:0,')'),
@@ -808,7 +972,8 @@ function App(){
                 tour.length>0&&React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'top-btn',onClick:function(){var b=new Blob([JSON.stringify(tour,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='tour.json';a.click();}},'Export'))
             )
         ),
-        error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000}},error,React.createElement('button',{onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer'}},'×'))
+        toast&&React.createElement('div',{className:'toast '+(toast.type||'success'),'role':'alert'},toast.msg),
+        error&&React.createElement('div',{style:{position:'fixed',bottom:20,right:20,background:'var(--red)',color:'white',padding:'12px 20px',borderRadius:8,zIndex:1000},'role':'alert'},error,React.createElement('button',{'aria-label':'Dismiss error',onClick:function(){setError(null);},style:{marginLeft:12,background:'none',border:'none',color:'white',cursor:'pointer'}},'×'))
     );
 }
 
