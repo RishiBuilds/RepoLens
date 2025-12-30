@@ -911,8 +911,14 @@ function App(){
         
         GitHub.scan(p.owner,p.repo,setProgress).then(function(files){
             if(!files.length)throw new Error('No code files found. The repository may be empty or inaccessible.');
-            var max=Math.min(files.length,200);
-            if(files.length>200)showNotification('Found '+files.length+' files. Analyzing first 200.','warning');
+            var SOFT_LIMIT=300,HARD_LIMIT=750;
+            if(files.length>SOFT_LIMIT&&files.length<=HARD_LIMIT){
+                var proceed=window.confirm('This repository has '+files.length+' files.\n\nAnalyzing large repos may be slow and could hit GitHub API rate limits.\n\nTip: Add a GitHub token for higher rate limits (5000/hour vs 60/hour).\n\nProceed with all '+files.length+' files?');
+                if(!proceed){setLoading(false);return;}
+            }else if(files.length>HARD_LIMIT){
+                showNotification('Found '+files.length+' files. Limiting to '+HARD_LIMIT+' for performance.','warning');
+            }
+            var max=Math.min(files.length,HARD_LIMIT);
             var analyzed=[];
             var allFns=[];
             
