@@ -87,7 +87,28 @@ Paste a PR URL to:
 
 ---
 
+## Privacy-centric
 
+RepoLens IQ is built with **strict privacy principles** from the ground up.
+
+### What We Don't Do
+- ❌ No backend servers
+- ❌ No analytics or tracking
+- ❌ No code storage or logging
+- ❌ No data collection
+- ❌ No third-party services
+
+### What We Do
+- ✅ Runs **100% in your browser**
+- ✅ All processing happens locally
+- ✅ Makes API calls directly from your browser to GitHub
+- ✅ GitHub tokens (if used) stay only in browser memory
+- ✅ Tokens are cleared when you close the tab
+- ✅ Works with both public and private repositories
+
+**Your code never leaves your machine. Ever.**
+
+---
 
 
 
