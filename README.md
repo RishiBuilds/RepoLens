@@ -20,7 +20,7 @@
 ## Why RepoLens IQ?
 
 Opening a new codebase shouldn’t mean hours of guesswork, hidden dependencies, and unnecessary risk.
-**RepoLens IQ** gives you **clear, visual, actionable insight** into how a repository is structured—and how **every change ripples through it**—so teams can **onboard faster, make safer changes, and move with confidence**.
+**RepoLens IQ** gives you **clear, visual, actionable insight** into how a repository is structured...and how **every change ripples through it**..so teams can **onboard faster, make safer changes, and move with confidence**.
 
 
 **Perfect for:**
