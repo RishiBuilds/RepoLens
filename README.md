@@ -19,10 +19,8 @@
 
 ## Why RepoLens IQ?
 
-**Understand any repo in minutes**. **RepoLens IQ** gives instant visual context so you can see structure, spot impact, and ship changes with confidence.
-
-Instead of scanning blindly, you see **how the repo is shaped, where complexity lives**, and **what changes actually affect**—before touching a line of code.
-
+Opening a new codebase shouldn’t mean hours of guesswork, hidden dependencies, and unnecessary risk.
+**RepoLens IQ** gives you **clear, visual, actionable insight** into how a repository is structured—and how **every change ripples through it**—so teams can **onboard faster, make safer changes, and move with confidence**.
 **Perfect for:**
 - 👥 **Developers** onboard faster and understand the codebase from day one
 - 🔍 **Tech leads** review pull requests with real architectural context
@@ -34,3 +32,23 @@ Instead of scanning blindly, you see **how the repo is shaped, where complexity 
 ```
 
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
