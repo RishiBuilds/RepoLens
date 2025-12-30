@@ -13,8 +13,6 @@
 [![Browser Support](https://img.shields.io/badge/Browser-Chrome%20%7C%20Firefox%20%7C%20Edge-blue)](https://github.com/RishiBuilds/Repolens)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success)](https://github.com/RishiBuilds/RepoLens)
 
-</div>
-
 [Quick Start](#-quick-start) • [Features](#-key-features) • [Usage](#-usage) • [Privacy](#-privacy-first)
 
 </div>
