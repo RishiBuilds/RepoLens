@@ -247,7 +247,7 @@ For larger repositories, we recommend using a token.
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                   CodeFlow                      │
+│               RepoLens IQ: codeflow             │
 ├─────────────────────────────────────────────────┤
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
 │  │  Parser  │  │  GitHub  │  │    D3    │       │
