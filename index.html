@@ -667,29 +667,34 @@ function countFiles(n){return n.files.length+Object.values(n.children).reduce(fu
 function calcBlast(fileId,conns,files){
     var affected=new Set();
     var queue=[fileId];
-    var visited=new Set();
+    var visited=new Set([fileId]);
     var depth=0;
     var maxDepth=0;
-    while(queue.length>0&&depth<5){
-        var size=queue.length;
-        for(var i=0;i<size;i++){
-            var cur=queue.shift();
-            if(visited.has(cur))continue;
-            visited.add(cur);
+    while(queue.length>0&&depth<6){
+        var nextQueue=[];
+        queue.forEach(function(cur){
              conns.forEach(function(c){
                 var src=typeof c.source==='object'?c.source.id:c.source;
                 var tgt=typeof c.target==='object'?c.target.id:c.target;
-                if(tgt===cur&&!visited.has(src)){affected.add(src);queue.push(src);maxDepth=depth+1;}
+                
+                if(src===cur&&!visited.has(tgt)){
+                    affected.add(tgt);
+                    visited.add(tgt);
+                    nextQueue.push(tgt);
+                    maxDepth=depth+1;
+                }
             });
+        });
+        queue=nextQueue;
         }
         depth++;
     }
     var cnt=affected.size;
     var pct=files.length>0?Math.round(cnt/files.length*100):0;
     var level='low';
-    if(pct>30)level='critical';else if(pct>20)level='high';else if(pct>10)level='medium';
-    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:maxDepth};
-}
+    if(pct>40)level='critical';else if(pct>25)level='high';else if(pct>10)level='medium';
+    return{affected:Array.from(affected),count:cnt,percent:pct,level:level,depth:maxDepth
+    };
 
 function calcHealth(data){
     if(!data)return{score:0,grade:'F'};
