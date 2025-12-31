@@ -6,14 +6,14 @@
 
 **RepoLens IQ** turns any GitHub repository into **instant, actionable insights**—right in your browser.
 
-**No installation. No backend. No data collection.**
+**No installation. No backend. No tracking.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-[![Browser Support](https://img.shields.io/badge/Browser-Chrome%20%7C%20Firefox%20%7C%20Edge-blue)](https://github.com/RishiBuilds/Repolens)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success)](https://github.com/RishiBuilds/RepoLens)
+[![Browser Support](https://img.shields.io/badge/Browser-Chrome%20%7C%20Firefox%20%7C%20Edge-blue)](https://github.com/RishiBuilds/RepoLens-IQ)
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success)](https://github.com/RishiBuilds/RepoLens-IQ)
 
-[Quick Start](#-quick-start) • [Features](#-key-features) • [Usage](#-usage) • [Privacy](#-privacy-centric)
+[Report a Bug](https://github.com/RishiBuilds/RepoLens-IQ/issues) • [Pull Requests Welcome](https://github.com/RishiBuilds/RepoLens-IQ/pulls)
 
 <img src="repolens-architecture-graph.png" alt="RepoLens IQ Codebase Graph View" width="100%" height:auto/>
 
@@ -135,10 +135,19 @@ RepoLens IQ uses a simple, privacy-first architecture:
 
 ## Quick Start
 
-1. Clone the repository:
+### Option 1: Use Online (Recommended)
+Open **RepoLens IQ** in your browser and paste any GitHub repository URL to instantly explore its structure and insights.
+
+→ No setup. No install. No sign-up.
+
+---
+
+### Option 2: Self-Host
+Run RepoLens IQ locally in seconds.
+
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/RishiBuilds/Repolens.git
-   ```
+   git clone https://github.com/RishiBuilds/RepoLens-IQ.git
 
 2. Open `index.html` in your browser
 
@@ -151,11 +160,11 @@ That's it! No build process, no npm install, no dependencies. **It's just one HT
 ### Public Repositories
 Simply paste the repository URL or owner/repo format:
 ```
-RishiBuilds/RepoLens
+RishiBuilds/RepoLens-IQ
 ```
 or
 ```
-https://github.com/RishiBuilds/RepoLens
+https://github.com/RishiBuilds/RepoLens-IQ
 ```
 
 ### Private Repositories
@@ -178,7 +187,7 @@ After analysis, click the 🔗 button to copy a shareable link. Anyone with the 
 
 ## Supported Languages
 
-RepoLens extracts functions and analyzes dependencies for:
+RepoLens IQ extracts functions and analyzes dependencies for:
 
 | Language | Extensions |
 |----------|------------|
@@ -290,31 +299,50 @@ Try analyzing these repositories to see RepoLens IQ in action:
 
 Contributions are welcome! Here's how you can help:
 
-1. **Report Bugs:** Open an issue with detailed information
-2. **Suggest Features:** Share your ideas for improvements
-3. **Submit PRs:** Fork the repo, make changes, and submit a pull request
-4. **Improve Documentation:** Help make the README and code comments better
-5. **Share:** Star the repo and share it with others!
+1. **Report bugs:** Open an issue with clear steps to reproduce, expected behavior, and screenshots or logs if possible.
+2. **Suggest features:** Share your ideas in the Issues or Discussions tab, explaining the problem and the value of your proposal.
+3. **Submit PRs:** Fork the repository, create a feature branch, make your changes, and open a pull request with a concise description.
+4. **Improve documentation:** Help refine the README, in-app copy, or code comments to make RepoLens IQ easier to understand.
+5. **Share:** Star the repo and share it with other developers who might benefit from it.
 
-**Guidelines:**
-- Keep the single-file architecture (everything in `index.html`)
-- Maintain zero dependencies (use CDNs only)
-- Follow the existing code style
-- Test in multiple browsers
+### Guidelines
+
+- Keep the single-file architecture (everything in `index.html`).
+- Maintain zero dependencies (only use trusted CDNs when absolutely necessary).
+- Follow the existing code style and patterns used in the project.
+- Test in multiple browsers (Chrome, Firefox, Edge at minimum) before submitting.
+- Keep pull requests focused and small, with clear commit messages.
+
+By contributing, you agree that your contributions will be licensed under the same MIT License as this project.
+
+---
+
+## License
+
+RepoLens IQ is released under the MIT License.  
+You are free to use, modify, and distribute this software, provided that you include the original copyright and license notice in any copies or substantial portions of the software.  
+
+See the [LICENSE](./LICENSE) file in this repository for the full text.
 
 ---
 
 <div align="center">
 
-**Made 🧩 by developers, for developers**
+**Crafted 🧩 by developers, for developers**
 
-*Look first, conclude later.*
+*See the system before you change it.*
 
-[⭐ Star on GitHub](https://github.com/RishiBuilds/RepoLens) • [🐛 Report Issue](https://github.com/RishiBuilds/RepoLens/issues) • [💬 Discussions](https://github.com/RishiBuilds/RepoLens/discussions)
+[⭐ Star on GitHub](https://github.com/RishiBuilds/RepoLens-IQ) • [🐛 Report Issue](https://github.com/RishiBuilds/RepoLens-IQ/issues) • [💬 Join Discussions](https://github.com/RishiBuilds/RepoLens-IQ/discussions)
 
 </div>
 
+---
 
+<div align="center">
+
+© 2025 • MIT License
+
+</div>
 
 
 
