@@ -2997,7 +2997,7 @@ function App(){
                     React.createElement('div',{className:'panel-content'},
                         rightTab==='details'&&(selected?React.createElement(React.Fragment,null,
                              React.createElement('button',{className:'top-btn',style:{width:'100%',marginBottom:12},onClick:function(){setSelected(null);setBlastRadius(null);if(nodesRef.current){nodesRef.current.selectAll('.nc').transition().duration(200).attr('opacity',1).attr('fill',getNodeColor);}if(linksRef.current){linksRef.current.transition().duration(200).attr('stroke-opacity',0.4).attr('stroke',theme==='light'?'#ccc':'#333');}}},'← Back to Issues'),
-                           React.createElement('div',{className:'panel-header',style:{margin:'-12px -12px 12px',padding:12}},
+                           React.createElement('div',{className:'panel-header',style:{margin:'0 -12px 12px',padding:12}},
                                 React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
                                     React.createElement('div',null,
                                         React.createElement('div',{className:'panel-title'},'📄 ',selected.name),
