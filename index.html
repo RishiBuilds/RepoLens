@@ -1164,17 +1164,17 @@ function App(){
                 Object.values(fnStats).forEach(function(s){s.callers=Array.from(s.callers.values());s.count=s.internal+s.external;});
                 var issues=[];
                 var deadFns=Object.entries(fnStats).filter(function(x){return x[1].internal===0&&x[1].external===0;});
-                if(deadFns.length)issues.push({type:'warning',title:deadFns.length+' Unused Functions',desc:'Functions not called from other files',items:deadFns.slice(0,10).map(function(x){return{name:x[0],file:x[1].file};})});
+                if(deadFns.length)issues.push({type:'warning',title:deadFns.length+' Unused Functions',desc:'Functions not called from other files',items:deadFns.map(function(x){return{name:x[0],file:x[1].file,line:x[1].line,code:x[1].code};})});
                 var godFiles=analyzed.filter(function(f){return f.functions.length>15;});
-                if(godFiles.length)issues.push({type:'critical',title:godFiles.length+' Large Files',desc:'Files with 15+ functions',items:godFiles.slice(0,5).map(function(f){return{name:f.name+' ('+f.functions.length+' fns)',file:f.path};})});
+                if(godFiles.length)issues.push({type:'critical',title:godFiles.length+' Large Files',desc:'Files with 15+ functions',items:godFiles.map(function(f){return{name:f.name+' ('+f.functions.length+' fns)',file:f.path,fns:f.functions.length,lines:f.lines};})});
                 var coupling={};
                 conns.forEach(function(c){coupling[c.target]=(coupling[c.target]||0)+1;});
-                var highCoup=Object.entries(coupling).filter(function(x){return x[1]>8;});
-                if(highCoup.length)issues.push({type:'warning',title:highCoup.length+' Highly Coupled',desc:'Files imported by 8+ others',items:highCoup.slice(0,5).map(function(x){return{name:x[0].split('/').pop()+' ('+x[1]+' imports)',file:x[0]};})});
+                var highCoup=Object.entries(coupling).filter(function(x){return x[1]>8;}).sort(function(a,b){return b[1]-a[1];});
+                if(highCoup.length)issues.push({type:'warning',title:highCoup.length+' Highly Coupled',desc:'Files imported by 8+ others',items:highCoup.map(function(x){return{name:x[0].split('/').pop()+' ('+x[1]+' imports)',file:x[0],imports:x[1]};})});
                 var connSet=new Set(conns.map(function(c){return c.source+'|'+c.target;}));
                 var circular=[];
                 conns.forEach(function(c){if(connSet.has(c.target+'|'+c.source)){var key=[c.source,c.target].sort().join('|');if(!circular.includes(key))circular.push(key);}});
-                if(circular.length)issues.push({type:'critical',title:circular.length+' Circular Dependencies',desc:'Files that import each other',items:circular.slice(0,5).map(function(p){return{name:p.split('|').map(function(x){return x.split('/').pop();}).join(' ↔ ')};})});
+                if(circular.length)issues.push({type:'critical',title:circular.length+' Circular Dependencies',desc:'Files that import each other',items:circular.map(function(p){var parts=p.split('|');return{name:parts.map(function(x){return x.split('/').pop();}).join(' ↔ '),files:parts};})});
                 var patterns=Parser.detectPatterns(analyzed);
                 var securityIssues=Parser.detectSecurity(analyzed);
                 var duplicates=Parser.detectDuplicates(analyzed,allFns);
@@ -1191,14 +1191,14 @@ function App(){
                 if(duplicates.length>0){
                     var nameDups=duplicates.filter(function(d){return d.type==='name';});
                     var codeDups=duplicates.filter(function(d){return d.type==='code';});
-                    if(nameDups.length)issues.push({type:'warning',title:nameDups.length+' Duplicate Function Names',desc:'Same function name in multiple files',items:nameDups.slice(0,5).map(function(d){return{name:d.name+' ('+d.count+' files)',suggestion:d.suggestion};})});
-                    if(codeDups.length)issues.push({type:'warning',title:codeDups.length+' Similar Code Blocks',desc:'Copy-paste code detected',items:codeDups.slice(0,5).map(function(d){return{name:d.name,suggestion:d.suggestion};})});
+                    if(nameDups.length)issues.push({type:'warning',title:nameDups.length+' Duplicate Function Names',desc:'Same function name in multiple files',items:nameDups.map(function(d){return{name:d.name+' ('+d.count+' files)',suggestion:d.suggestion,files:d.files,count:d.count};})});
+                    if(codeDups.length)issues.push({type:'warning',title:codeDups.length+' Similar Code Blocks',desc:'Copy-paste code detected',items:codeDups.map(function(d){return{name:d.name,suggestion:d.suggestion,files:d.files};})});
                 }
                 if(layerViolations.length>0){
-                    issues.push({type:'critical',title:layerViolations.length+' Architecture Violations',desc:'Lower layers importing from higher layers',items:layerViolations.slice(0,5).map(function(v){return{name:v.fromLayer+' → '+v.toLayer,file:v.from,suggestion:v.suggestion};})});
+                    issues.push({type:'critical',title:layerViolations.length+' Architecture Violations',desc:'Lower layers importing from higher layers',items:layerViolations.map(function(v){return{name:v.fromLayer+' → '+v.toLayer,file:v.from,toFile:v.to,fn:v.fn,suggestion:v.suggestion};})});
                 }
-                var highComplexity=analyzed.filter(function(f){return f.complexity&&f.complexity.level==='critical';});
-                if(highComplexity.length)issues.push({type:'warning',title:highComplexity.length+' High Complexity Files',desc:'Files with complexity score >30',items:highComplexity.slice(0,5).map(function(f){return{name:f.name+' ('+f.complexity.score+')',file:f.path};})});
+                var highComplexity=analyzed.filter(function(f){return f.complexity&&f.complexity.level==='critical';}).sort(function(a,b){return b.complexity.score-a.complexity.score;});
+                if(highComplexity.length)issues.push({type:'warning',title:highComplexity.length+' High Complexity Files',desc:'Files with complexity score >30',items:highComplexity.map(function(f){return{name:f.name+' ('+f.complexity.score+')',file:f.path,score:f.complexity.score,lines:f.lines};})});
                 var dataObj={files:analyzed,functions:allFns,connections:conns,fnStats:fnStats,folders:folders,tree:tree,issues:issues,patterns:patterns,securityIssues:securityIssues,duplicates:duplicates,layerViolations:layerViolations,deadFunctions:deadFns.map(function(x){var codeLines=x[1].code?x[1].code.split('\n').length:0;return{name:x[0],file:x[1].file,folder:x[1].folder,line:x[1].line,code:x[1].code,codeLines:codeLines,ext:x[1].file.split('.').pop()};}),stats:{files:analyzed.length,functions:allFns.length,connections:conns.length,dead:deadFns.length,patterns:patterns.length,security:securityIssues.filter(function(i){return i.severity==='high';}).length,duplicates:duplicates.length,violations:layerViolations.length,loc:totalLoc,languages:langArray}};
                 dataObj.suggestions=Parser.generateSuggestions(dataObj);
                 setData(dataObj);
@@ -2580,10 +2580,28 @@ function App(){
                             React.createElement('div',{style:{fontSize:11,color:'var(--t2)'}},drillDown.data.desc)
                         ),
                         React.createElement('div',{style:{fontSize:12,fontWeight:600,marginBottom:12}},'All Affected Items (',drillDown.data.items?drillDown.data.items.length:0,')'),
-                        drillDown.data.items&&drillDown.data.items.map(function(item,j){return React.createElement('div',{key:j,style:{background:'var(--bg0)',padding:12,borderRadius:8,marginBottom:8,cursor:item.file?'pointer':'default',borderLeft:'3px solid var(--acc)'},onClick:function(){if(item.file){selectFile(item.file);setDrillDown(null);}}},
-                            React.createElement('div',{style:{fontWeight:600,fontSize:11}},item.name),
-                            item.file&&React.createElement('div',{style:{fontSize:10,color:'var(--t3)',marginTop:4,fontFamily:'monospace'}},item.file),
-                            item.suggestion&&React.createElement('div',{style:{fontSize:10,color:'var(--acc)',marginTop:6,padding:'6px 8px',background:'var(--bg2)',borderRadius:4}},'💡 ',item.suggestion)
+                        drillDown.data.items&&drillDown.data.items.map(function(item,j){return React.createElement('div',{key:j,style:{background:'var(--bg0)',padding:12,borderRadius:8,marginBottom:8,borderLeft:'3px solid var(--acc)'}},
+                            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+                                React.createElement('div',{style:{fontWeight:600,fontSize:11}},item.name),
+                                item.file&&React.createElement('button',{style:{fontSize:9,padding:'4px 8px',background:'var(--acc)',color:'var(--bg0)',border:'none',borderRadius:4,cursor:'pointer'},onClick:function(e){e.stopPropagation();selectFile(item.file);setDrillDown(null);}},'Go to file →')
+                            ),
+                            item.file&&React.createElement('div',{style:{fontSize:10,color:'var(--t3)',marginTop:4,fontFamily:'monospace'}},item.file,item.line?' : '+item.line:''),
+                            (item.lines||item.fns||item.imports||item.score)&&React.createElement('div',{style:{display:'flex',gap:12,marginTop:8}},
+                                item.lines&&React.createElement('span',{style:{fontSize:9,color:'var(--purple)'}},item.lines,' lines'),
+                                item.fns&&React.createElement('span',{style:{fontSize:9,color:'var(--orange)'}},item.fns,' functions'),
+                                item.imports&&React.createElement('span',{style:{fontSize:9,color:'var(--blue)'}},item.imports,' imports'),
+                                item.score&&React.createElement('span',{style:{fontSize:9,color:'var(--red)'}},'Complexity: ',item.score)
+                            ),
+                            item.code&&React.createElement('pre',{style:{fontSize:9,background:'var(--bg2)',padding:8,borderRadius:4,marginTop:8,overflow:'auto',maxHeight:100,fontFamily:'monospace'}},item.code),
+                            item.suggestion&&React.createElement('div',{style:{fontSize:10,color:'var(--acc)',marginTop:8,padding:'6px 8px',background:'var(--bg2)',borderRadius:4}},'💡 ',item.suggestion),
+                            // For items with nested files (like duplicates)
+                            item.files&&React.createElement('div',{style:{marginTop:8}},
+                                React.createElement('div',{style:{fontSize:9,color:'var(--t3)',marginBottom:4}},'Locations:'),
+                                item.files.map(function(f,k){return React.createElement('div',{key:k,style:{fontSize:9,color:'var(--t2)',padding:'4px 8px',background:'var(--bg2)',borderRadius:4,marginBottom:4,cursor:'pointer',display:'flex',justifyContent:'space-between'},onClick:function(){selectFile(f.file||f);setDrillDown(null);}},
+                                    React.createElement('span',{style:{fontFamily:'monospace'}},typeof f==='string'?f.split('/').pop():(f.file||'').split('/').pop(),f.line?' :'+f.line:''),
+                                    React.createElement('span',{style:{color:'var(--acc)'}},'→')
+                                );})
+                            )
                         );})
                     ),
                     // Pattern drill-down
