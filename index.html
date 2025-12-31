@@ -2819,7 +2819,7 @@ function App(){
     function copyLink(){navigator.clipboard.writeText(window.location.href).then(function(){showNotification('Link copied to clipboard!');}).catch(function(){showNotification('Failed to copy link','error');});}
     function analyzePR(){if(!prUrl||!repoInfo)return;var m=prUrl.match(/\/pull\/(\d+)/);if(!m){showNotification('Invalid PR URL','error');return;}GitHub.getPR(repoInfo.owner,repoInfo.repo,m[1]).then(function(pr){if(pr)setPrData(pr);else showNotification('Could not load PR','error');});}
     function resetAnalysis(){setData(null);setSelected(null);setBlastRadius(null);setOwnership(null);setRepoInfo(null);setRepoUrl('');setPrData(null);setFolderFilter(null);window.history.replaceState({},'',window.location.pathname);}
-    function filterByFolder(path){setFolderFilter(folderFilter===path?null:path);}
+    function filterByFolder(path){setFolderFilter(function(prev){return prev===path?null:path;});}
     var health=useMemo(function(){return calcHealth(data);},[data]);
 
     return React.createElement('div',{className:'app'},
