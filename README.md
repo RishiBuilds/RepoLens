@@ -4,7 +4,7 @@
 
 ### Instant Codebase Intelligence for GitHub
 
-[![Live Preview](https://img.shields.io/badge/Live-Demo-blueviolet?style=for-the-badge&logo=vercel)](https://repo-lens-iq.vercel.app)
+[![Live Preview](https://img.shields.io/badge/Live-Preview-blueviolet?style=for-the-badge&logo=vercel)](https://repo-lens-iq.vercel.app)
 
 **RepoLens IQ** turns any GitHub repository into **instant, actionable insights**—right in your browser.
 
