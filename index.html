@@ -1857,6 +1857,8 @@ function App(){
                     var calls=Parser.findCalls(file.content,fnNames,file.path,allFns);
                     Object.entries(calls).forEach(function(entry){
                         var fn=entry[0],cnt=entry[1];
+                        // Only process if there are actual calls (cnt > 0)
+                        if(cnt<=0)return;
                         var def=fnStats[fn]?fnStats[fn].file:null;
                         if(def){
                             if(def===file.path){
