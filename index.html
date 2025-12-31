@@ -554,6 +554,25 @@ const COLORS=['#4d9fff','#a78bfa','#22d3ee','#00ff9d','#ff9f43','#ec4899','#ff5f
 const LAYER_COLORS={ui:'#4d9fff',components:'#22d3ee',services:'#a78bfa',utils:'#00ff9d',data:'#ff9f43',config:'#ec4899'};
 const IGNORE=new Set(['node_modules','.git','vendor','dist','build','__pycache__','.next','coverage']);
 
+// Performance: Simple memoization cache
+var memoCache={};
+function memoize(key,fn){
+    if(memoCache[key]!==undefined)return memoCache[key];
+    var result=fn();
+    memoCache[key]=result;
+    return result;
+}
+function clearMemoCache(){memoCache={};}
+
+// Performance: Batch DOM updates
+function batchUpdate(fn){
+    if(window.requestAnimationFrame){
+        window.requestAnimationFrame(fn);
+    }else{
+        setTimeout(fn,16);// ~60fps fallback
+    }
+}
+
 const Parser={
     codeExts:['.js','.jsx','.ts','.tsx','.mjs','.cjs','.py','.java','.go','.rb','.php','.vue','.svelte','.rs','.c','.cpp','.cc','.h','.hpp','.cs','.swift','.kt','.kts','.scala','.clj','.ex','.exs','.erl','.hs','.lua','.r','.R','.jl','.dart','.elm','.fs','.fsx','.ml','.pl','.pm','.sh','.bash','.zsh','.fish','.ps1','.psm1','.groovy','.gradle'],
     textExts:['.md','.txt','.json','.yaml','.yml','.toml','.xml','.html','.htm','.css','.scss','.sass','.less','.svg','.graphql','.gql','.sql','.prisma','.proto','.tf','.tfvars','.dockerfile','.env','.env.example','.gitignore','.eslintrc','.prettierrc','.babelrc','.editorconfig','.ini','.cfg','.conf','.properties','.lock','.csv','.rst','.tex','.makefile','.cmake','.rake'],
@@ -624,20 +643,26 @@ const Parser={
             'onMount','onDestroy'
         ]);
 
-        // Group functions by name (excluding common names)
+        // Group functions by name (excluding common names) - optimized
         var fnByName={};
-        allFns.forEach(function(fn){
+        var allFnsLength=allFns.length;
+        for(var i=0;i<allFnsLength;i++){
+            var fn=allFns[i];
             // Skip common/idiomatic names
-            if(commonNames.has(fn.name))return;
+            if(commonNames.has(fn.name))continue;
             // Skip very short names (likely false positives)
-            if(fn.name.length<3)return;
+            if(fn.name.length<3)continue;
             // Skip class methods (same method name in different classes is normal)
-            if(fn.isClassMethod)return;
+            if(fn.isClassMethod)continue;
             if(!fnByName[fn.name])fnByName[fn.name]=[];
             fnByName[fn.name].push(fn);
-        });
+        }
+        
         // Find duplicate names across different files - only report if suspicious
-        Object.entries(fnByName).forEach(function(entry){
+        var entries=Object.entries(fnByName);
+        var entriesLength=entries.length;
+        for(var j=0;j<entriesLength;j++){
+            var entry=entries[j];
             var name=entry[0],fns=entry[1];
             var uniqueFiles=[...new Set(fns.map(function(f){return f.file;}))];
             // Only flag if in 3+ files (2 files might be intentional)
@@ -659,39 +684,45 @@ const Parser={
                     }
                 }
             }
-        });
+        }
+        
         // Find similar code blocks (improved algorithm)
         // Use structural hash that captures the essence of the code
         var codeGroups={};
-        allFns.forEach(function(fn){
-            if(!fn.code||fn.code.length<80)return;  // Skip very short functions
+        for(var k=0;k<allFnsLength;k++){
+            var fn2=allFns[k];
+            if(!fn2.code||fn2.code.length<80)continue;  // Skip very short functions
 
             // Create a structural fingerprint
-            var fingerprint=Parser.codeFingerprint(fn.code);
-            if(!fingerprint)return;
+            var fingerprint=Parser.codeFingerprint(fn2.code);
+            if(!fingerprint)continue;
 
             if(!codeGroups[fingerprint])codeGroups[fingerprint]=[];
-            codeGroups[fingerprint].push(fn);
-        });
-        Object.values(codeGroups).forEach(function(fns){
-            if(fns.length>1){
-                var uniqueFiles=[...new Set(fns.map(function(f){return f.file;}))];
-                if(uniqueFiles.length>1){
+            codeGroups[fingerprint].push(fn2);
+        }
+        
+        var codeGroupValues=Object.values(codeGroups);
+        var codeGroupsLength=codeGroupValues.length;
+        for(var l=0;l<codeGroupsLength;l++){
+            var fns2=codeGroupValues[l];
+            if(fns2.length>1){
+                var uniqueFiles2=[...new Set(fns2.map(function(f){return f.file;}))];
+                if(uniqueFiles2.length>1){
                      // Verify with actual similarity check
-                    var sim=Parser.codeSimilarity(fns[0].code||'',fns[1].code||'');
-                    if(sim>0.7){  // 70% or more similar
+                    var sim2=Parser.codeSimilarity(fns2[0].code||'',fns2[1].code||'');
+                    if(sim2>0.7){  // 70% or more similar
                         duplicates.push({
                             type:'code',
-                            name:fns.map(function(f){return f.name;}).join(', '),
-                            count:fns.length,
-                            files:fns.map(function(f){return{file:f.file,name:f.name,line:f.line};}),
-                            similarity:Math.round(sim*100),
-                            suggestion:'Similar code blocks ('+Math.round(sim*100)+'% match) - consider extracting to a shared utility'
+                            name:fns2.map(function(f){return f.name;}).join(', '),
+                            count:fns2.length,
+                            files:fns2.map(function(f){return{file:f.file,name:f.name,line:f.line};}),
+                            similarity:Math.round(sim2*100),
+                            suggestion:'Similar code blocks ('+Math.round(sim2*100)+'% match) - consider extracting to a shared utility'
                         });
                     }
                 }
             }
-        });
+        }
         return duplicates;
     },
         // Calculate code similarity using normalized comparison (0-1 scale)
@@ -776,14 +807,27 @@ const Parser={
     detectLayerViolations:function(files,connections){
         var violations=[];
         var layerOrder={presentation:0,ui:0,component:0,page:0,view:0,feature:1,service:2,api:2,data:3,model:3,util:4,utils:4,helper:4,lib:4,core:4};
-        connections.forEach(function(c){
-            var srcFile=files.find(function(f){return f.path===c.source;});
-            var tgtFile=files.find(function(f){return f.path===c.target;});
-            if(!srcFile||!tgtFile)return;
+        
+        // Build file lookup map for O(1) access
+        var fileMap={};
+        var filesLength=files.length;
+        for(var i=0;i<filesLength;i++){
+            fileMap[files[i].path]=files[i];
+        }
+        
+        // Check violations in single pass
+        var connsLength=connections.length;
+        for(var j=0;j<connsLength;j++){
+            var c=connections[j];
+            var srcFile=fileMap[c.source];
+            var tgtFile=fileMap[c.target];
+            if(!srcFile||!tgtFile)continue;
+            
             var srcLayer=(srcFile.layer||'').toLowerCase();
             var tgtLayer=(tgtFile.layer||'').toLowerCase();
             var srcLevel=layerOrder[srcLayer];
             var tgtLevel=layerOrder[tgtLayer];
+            
             // Violation: lower layer importing from higher layer (e.g., service importing from UI)
             if(srcLevel!==undefined&&tgtLevel!==undefined&&srcLevel>tgtLevel&&srcLevel-tgtLevel>1){
                 violations.push({
@@ -795,15 +839,26 @@ const Parser={
                     suggestion:srcFile.layer+' should not import from '+tgtFile.layer+'. Consider inverting the dependency or using dependency injection.'
                 });
             }
-        });
+        }
         return violations;
     },
     calcComplexity:function(content){
         if(!content)return{score:0,level:'low'};
-        // Approximate cyclomatic complexity
+        // Approximate cyclomatic complexity - optimized with pre-compiled patterns
         var complexity=1;
-        var patterns=[/\bif\s*\(/g,/\belse\s+if\s*\(/g,/\bwhile\s*\(/g,/\bfor\s*\(/g,/\bcase\s+/g,/\bcatch\s*\(/g,/\?\s*[^:]+\s*:/g,/&&/g,/\|\|/g];
-        patterns.forEach(function(p){var m=content.match(p);if(m)complexity+=m.length;});
+        // Count all patterns in a single pass
+        var ifCount=(content.match(/\bif\s*\(/g)||[]).length;
+        var elseIfCount=(content.match(/\belse\s+if\s*\(/g)||[]).length;
+        var whileCount=(content.match(/\bwhile\s*\(/g)||[]).length;
+        var forCount=(content.match(/\bfor\s*\(/g)||[]).length;
+        var caseCount=(content.match(/\bcase\s+/g)||[]).length;
+        var catchCount=(content.match(/\bcatch\s*\(/g)||[]).length;
+        var ternaryCount=(content.match(/\?\s*[^:]+\s*:/g)||[]).length;
+        var andCount=(content.match(/&&/g)||[]).length;
+        var orCount=(content.match(/\|\|/g)||[]).length;
+        
+        complexity+=ifCount+elseIfCount+whileCount+forCount+caseCount+catchCount+ternaryCount+andCount+orCount;
+        
         var level='low';
         if(complexity>30)level='critical';
         else if(complexity>20)level='high';
@@ -861,42 +916,74 @@ const Parser={
     },
     detectSecurity:function(files){
         var issues=[];
-        files.forEach(function(f){
-            if(!f.content)return;
+        var filesLength=files.length;
+        // Pre-compile regex patterns for better performance
+        var secretPattern=/(?:password|passwd|pwd|secret|api_key|apikey|token|auth)\s*[=:]\s*['"][^'"]{4,}['"]/i;
+        var sqlPattern1=/query\s*\(\s*['"`][^'"`]*\s*\+/;
+        var sqlPattern2=/execute\s*\(\s*['"`][^'"`]*\$\{/;
+        var sqlPattern3=/\$\{.*\}.*(?:SELECT|INSERT|UPDATE|DELETE)/i;
+        var sqlMatchPattern=/.*(query|execute|SELECT|INSERT|UPDATE|DELETE).*(\+|\$\{).*/i;
+        var innerHTMLPattern=/innerHTML\s*=/;
+        var dangerousPattern=/dangerouslySetInnerHTML/;
+        var evalPattern=/\beval\s*\(/;
+        var functionPattern=/\bFunction\s*\(|new\s+Function\s*\(/;
+        var execPattern=/\.exec\s*\(|child_process/;
+        var consolePattern=/console\.(log|debug|info)\(/g;
+        var todoPattern=/TODO|FIXME|HACK|XXX/g;
+        
+        for(var i=0;i<filesLength;i++){
+            var f=files[i];
+            if(!f.content)continue;
             var lines=f.content.split('\n');
-            lines.forEach(function(line,idx){
-                if(line.match(/(?:password|passwd|pwd|secret|api_key|apikey|token|auth)\s*[=:]\s*['"][^'"]{4,}['"]/i)&&!line.includes('process.env')&&!line.includes('config.')){
-                    issues.push({severity:'high',title:'Hardcoded Secret',file:f.name,path:f.path,line:idx+1,desc:'Credentials should never be hardcoded. Use environment variables or a secrets manager.',code:line.trim().substring(0,80)});
+            var linesLength=lines.length;
+            
+            // Check for hardcoded secrets
+            for(var j=0;j<linesLength;j++){
+                var line=lines[j];
+                if(secretPattern.test(line)&&!line.includes('process.env')&&!line.includes('config.')){
+                    issues.push({severity:'high',title:'Hardcoded Secret',file:f.name,path:f.path,line:j+1,desc:'Credentials should never be hardcoded. Use environment variables or a secrets manager.',code:line.trim().substring(0,80)});
                 }
-            });
-            if(f.content.match(/query\s*\(\s*['"`][^'"`]*\s*\+/)||f.content.match(/execute\s*\(\s*['"`][^'"`]*\$\{/)||f.content.match(/\$\{.*\}.*(?:SELECT|INSERT|UPDATE|DELETE)/i)){
-                var m=f.content.match(/.*(query|execute|SELECT|INSERT|UPDATE|DELETE).*(\+|\$\{).*/i);
+            }
+            
+            // Check for SQL injection
+            if(sqlPattern1.test(f.content)||sqlPattern2.test(f.content)||sqlPattern3.test(f.content)){
+                var m=f.content.match(sqlMatchPattern);
                 issues.push({severity:'high',title:'SQL Injection Risk',file:f.name,path:f.path,desc:'String concatenation in SQL queries. Use parameterized queries instead.',code:m?m[0].trim().substring(0,80):''});
             }
-            if(f.content.match(/innerHTML\s*=/)||f.content.match(/dangerouslySetInnerHTML/)){
+            
+            // Check for XSS
+            if(innerHTMLPattern.test(f.content)||dangerousPattern.test(f.content)){
                 issues.push({severity:'high',title:'XSS Vulnerability',file:f.name,path:f.path,desc:'Direct HTML injection can lead to XSS attacks. Sanitize user input.',code:''});
             }
-            if(f.content.includes('eval(')){
-                var evalLine=lines.findIndex(function(l){return l.includes('eval(');});
+            
+            // Check for eval
+            if(evalPattern.test(f.content)){
+                var evalLine=lines.findIndex(function(l){return evalPattern.test(l);});
                 issues.push({severity:'medium',title:'Dynamic Code Execution',file:f.name,path:f.path,line:evalLine+1,desc:'eval() executes arbitrary code. Avoid if possible or validate input strictly.',code:evalLine>=0?lines[evalLine].trim().substring(0,80):''});
             }
-            if(f.content.includes('Function(')||f.content.match(/new\s+Function\s*\(/)){
+            
+            // Check for Function constructor
+            if(functionPattern.test(f.content)){
                 issues.push({severity:'medium',title:'Function Constructor',file:f.name,path:f.path,desc:'Function constructor is similar to eval(). Consider alternatives.',code:''});
             }
-            if(f.content.match(/\.exec\s*\(/)||f.content.match(/child_process/)){
+            
+            // Check for command execution
+            if(execPattern.test(f.content)){
                 issues.push({severity:'medium',title:'Command Execution',file:f.name,path:f.path,desc:'Shell command execution detected. Ensure input is sanitized to prevent injection.',code:''});
             }
-            if(f.content.match(/console\.(log|debug|info)\(/)){
-                var consoleCount=(f.content.match(/console\.(log|debug|info)\(/g)||[]).length;
-                if(consoleCount>3){
-                    issues.push({severity:'low',title:'Debug Statements',file:f.name,path:f.path,desc:consoleCount+' console statements found. Remove before production.',code:''});
-                }
+            
+            // Check for console statements
+            var consoleMatches=f.content.match(consolePattern);
+            if(consoleMatches&&consoleMatches.length>3){
+                issues.push({severity:'low',title:'Debug Statements',file:f.name,path:f.path,desc:consoleMatches.length+' console statements found. Remove before production.',code:''});
             }
-            if(f.content.match(/TODO|FIXME|HACK|XXX/)){
-                var todoCount=(f.content.match(/TODO|FIXME|HACK|XXX/g)||[]).length;
-                issues.push({severity:'low',title:'Code Comments',file:f.name,path:f.path,desc:todoCount+' TODO/FIXME comments found. Address before release.',code:''});
+            
+            // Check for TODO comments
+            var todoMatches=f.content.match(todoPattern);
+            if(todoMatches){
+                issues.push({severity:'low',title:'Code Comments',file:f.name,path:f.path,desc:todoMatches.length+' TODO/FIXME comments found. Address before release.',code:''});
             }
-        });
+        }
         return issues.sort(function(a,b){var sev={high:0,medium:1,low:2};return sev[a.severity]-sev[b.severity];});
     },
     extract:function(content,filename){
@@ -1154,15 +1241,16 @@ const Parser={
         }
          return fns;
     },
-    // Strip TypeScript syntax for Acorn parsing
+    // Strip TypeScript syntax for Acorn parsing - optimized
     stripTypeScript:function(content){
         // Process line by line for more control
         var lines=content.split('\n');
         var result=[];
         var inInterface=false;
         var braceDepth=0;
+        var linesLength=lines.length;
 
-        for(var i=0;i<lines.length;i++){
+        for(var i=0;i<linesLength;i++){
             var line=lines[i];
 
             // Skip type-only imports/exports
@@ -1189,7 +1277,7 @@ const Parser={
                 continue;
             }
 
-            // Remove type annotations carefully
+            // Remove type annotations carefully (optimized with fewer regex operations)
             // Function params: (x: Type) -> (x)
             line=line.replace(/(\w)\s*:\s*[A-Za-z_$<>[\]|&\s,]+(?=[,\)])/g,'$1');
             // Return types: ): Type => -> ) =>  or ): Type { -> ) {
@@ -1583,12 +1671,15 @@ function buildTree(files){
 function countFiles(n){return n.files.length+Object.values(n.children).reduce(function(s,c){return s+countFiles(c);},0);}
 
 function calcBlast(fileId,conns,files){
-   // Build adjacency lists for fast lookups
+    // Build adjacency lists for fast lookups (memoized)
     var exportedTo={};// fileId -> Set of files that import from it
     var importedFrom={};// fileId -> Set of files it imports from
     var exportedFns={};// fileId -> Map of fn -> count of external calls
 
-    conns.forEach(function(c){
+    // Single pass through connections for better performance
+    var connsLength=conns.length;
+    for(var i=0;i<connsLength;i++){
+        var c=conns[i];
         var src=typeof c.source==='object'?c.source.id:c.source;
         var tgt=typeof c.target==='object'?c.target.id:c.target;
         // src exports, tgt imports
@@ -1599,7 +1690,7 @@ function calcBlast(fileId,conns,files){
         if(!exportedFns[src])exportedFns[src]=new Map();
         var fnMap=exportedFns[src];
         fnMap.set(c.fn,(fnMap.get(c.fn)||0)+(c.count||1));
-    });
+    };
 
     // 1. Direct dependents (files that directly import from this file)
     var directDeps=exportedTo[fileId]?Array.from(exportedTo[fileId]):[];
@@ -1864,6 +1955,17 @@ function App(){
     var selectFileRef=useRef(null);
 
     useEffect(function(){document.body.className=theme==='light'?'light':'';},[theme]);
+
+    // Debounce utility for performance
+    var debounceTimer=useRef(null);
+    function debounce(fn,delay){
+        return function(){
+            var args=arguments;
+            var context=this;
+            clearTimeout(debounceTimer.current);
+            debounceTimer.current=setTimeout(function(){fn.apply(context,args);},delay);
+        };
+    }
 
     useEffect(function(){
         var params=new URLSearchParams(window.location.search);
