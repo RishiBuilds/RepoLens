@@ -3073,7 +3073,7 @@ function App(){
             ),
             React.createElement('div',{className:'repo-input-group'},
                 React.createElement('input',{className:'repo-input','aria-label':'Repository URL',placeholder:'owner/repo or GitHub URL',value:repoUrl,onChange:function(e){setRepoUrl(e.target.value);},onKeyDown:function(e){if(e.key==='Enter'&&!loading)analyze();}}),
-                React.createElement('input',{className:'repo-input',type:'password','aria-label':'GitHub Token',placeholder:'Token (optional)',value:token,onChange:function(e){setToken(e.target.value);},onKeyDown:function(e){if(e.key==='Enter'&&!loading)analyze();},style:{maxWidth:120}}),
+                React.createElement('input',{className:'repo-input',type:'password','aria-label':'GitHub Token',placeholder:'Token',value:token,onChange:function(e){setToken(e.target.value);},onKeyDown:function(e){if(e.key==='Enter'&&!loading)analyze();},style:{maxWidth:120}}),
                 React.createElement('button',{id:'analyze-btn',className:'top-btn primary','aria-label':'Analyze repository',onClick:analyze,disabled:loading||!repoUrl},loading?'⏳':'🔍',' Analyze'),
                 data&&React.createElement('button',{className:'refresh-btn','aria-label':'Refresh analysis',onClick:analyze,disabled:loading,title:'Refresh Analysis'},'↻ Refresh'),
                 data&&React.createElement('button',{className:'reset-btn','aria-label':'Reset analysis',onClick:resetAnalysis,title:'Clear & Reset'},'✕ Reset')
@@ -3144,7 +3144,7 @@ function App(){
             ),
             React.createElement('div',{className:'canvas-area'},
                 loading?React.createElement('div',{className:'loading'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-text'},'Analyzing...'),React.createElement('div',{className:'loading-progress'},progress)):
-                !data?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🪬'),React.createElement('div',{className:'empty-title'},'RepoLens IQ'),React.createElement('div',{className:'empty-desc'},'Blast radius, ownership, patterns, security & more')):
+                !data?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🪬'),React.createElement('div',{className:'empty-title'},'RepoLens IQ'),React.createElement('div',{className:'empty-desc'},'Visualize architecture, ownership, security risks, blast radius, and design patterns')):
                 React.createElement(React.Fragment,null,
                     React.createElement('div',{className:'viz-selector'},
                         React.createElement('button',{className:'viz-selector-btn'+(graphConfig.vizType==='graph'?' active':''),onClick:function(){setGraphConfig(Object.assign({},graphConfig,{vizType:'graph'}));}},'🕸️ Graph'),
