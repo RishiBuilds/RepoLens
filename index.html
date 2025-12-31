@@ -587,9 +587,9 @@ const Parser={
         var providers=files.filter(function(f){return f.content&&(f.content.includes('createContext')||f.content.includes('Provider')||f.content.includes('useContext'));});
         if(providers.length)patterns.push({name:'Context Provider',icon:'🌐',desc:'React Context for global state. Alternative to prop drilling.',severity:'info',files:providers.map(function(f){return{name:f.name,path:f.path};}),metrics:{contexts:providers.length}});
         var godFiles=files.filter(function(f){return f.functions&&f.functions.length>15;});
-        if(godFiles.length)patterns.push({name:'God Object',icon:'⚠️',desc:'Files with too many responsibilities (15+ functions). Consider splitting into smaller modules.',severity:'warning',isAnti:true,files:godFiles.map(function(f){return{name:f.name,path:f.path,fns:f.functions.length};}),metrics:{files:godFiles.length,avgFns:Math.round(godFiles.reduce(function(s,f){return s+f.functions.length;},0)/godFiles.length)}});
+        if(godFiles.length)patterns.push({name:'God Object',icon:'⚠️',desc:'Files with too many responsibilities (15+ functions). Consider splitting into smaller modules.',severity:'warning',isAnti:true,files:godFiles.map(function(f){return{name:f.name,path:f.path,fns:f.functions.length};}),metrics:{files:godFiles.length,avgFns:godFiles.length>0?Math.round(godFiles.reduce(function(s,f){return s+f.functions.length;},0)/godFiles.length):0}});
         var longFiles=files.filter(function(f){return f.lines&&f.lines>500;});
-        if(longFiles.length)patterns.push({name:'Long File',icon:'📜',desc:'Files over 500 lines are harder to maintain. Consider breaking into smaller modules.',severity:'warning',isAnti:true,files:longFiles.map(function(f){return{name:f.name,path:f.path,lines:f.lines};}),metrics:{files:longFiles.length,avgLines:Math.round(longFiles.reduce(function(s,f){return s+f.lines;},0)/longFiles.length)}});
+        if(longFiles.length)patterns.push({name:'Long File',icon:'📜',desc:'Files over 500 lines are harder to maintain. Consider breaking into smaller modules.',severity:'warning',isAnti:true,files:longFiles.map(function(f){return{name:f.name,path:f.path,lines:f.lines};}),metrics:{files:longFiles.length,avgLines:longFiles.length>0?Math.round(longFiles.reduce(function(s,f){return s+f.lines;},0)/longFiles.length):0}});
         return patterns;
     },
     detectDuplicates:function(files,allFns){
@@ -646,7 +646,7 @@ const Parser={
                 var codeSamples=fns.filter(function(f){return f.code&&f.code.length>30;});
                 if(codeSamples.length>=2){
                     // Compare first two code samples for similarity
-                    var sim=Parser.codeSimilarity(codeSamples[0].code,codeSamples[1].code);
+                    var sim=Parser.codeSimilarity(codeSamples[0].code||'',codeSamples[1].code||'');
                     if(sim>0.5){  // More than 50% similar - likely a real duplicate
                         duplicates.push({
                             type:'name',
@@ -678,7 +678,7 @@ const Parser={
                 var uniqueFiles=[...new Set(fns.map(function(f){return f.file;}))];
                 if(uniqueFiles.length>1){
                      // Verify with actual similarity check
-                    var sim=Parser.codeSimilarity(fns[0].code,fns[1].code);
+                    var sim=Parser.codeSimilarity(fns[0].code||'',fns[1].code||'');
                     if(sim>0.7){  // 70% or more similar
                         duplicates.push({
                             type:'code',
@@ -1477,7 +1477,14 @@ var GitHub={
         }).catch(function(){return self.rateLimit;});
     },
 getFile:function(o,r,p){
-        return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/contents/'+p).then(function(d){return d.content?atob(d.content):null;}).catch(function(){return null;});
+        return this.fetch('https://api.github.com/repos/'+o+'/'+r+'/contents/'+p).then(function(d){
+            if(!d||!d.content)return null;
+            try{
+                return atob(d.content);
+            }catch(e){
+                return null;
+            }
+        }).catch(function(){return null;});
     },
     getCommits:function(o,r,path,limit){
         if(this.rateLimit.remaining<20&&!this.token)return Promise.resolve([]);
@@ -1485,8 +1492,14 @@ getFile:function(o,r,p){
     },
     getBlame:function(o,r,path){
         return this.getCommits(o,r,path,50).then(function(commits){
+            if(!commits||commits.length===0)return[];
             var authors={};
-            commits.forEach(function(c){var name=c.commit.author.name;authors[name]=(authors[name]||0)+1;});
+            commits.forEach(function(c){
+                if(c&&c.commit&&c.commit.author&&c.commit.author.name){
+                    var name=c.commit.author.name;
+                    authors[name]=(authors[name]||0)+1;
+                }
+            });
             return Object.entries(authors).map(function(e){return{name:e[0],commits:e[1],percent:Math.round(e[1]/commits.length*100)};}).sort(function(a,b){return b.commits-a.commits;});
         }).catch(function(){return[];});
     },
@@ -1629,7 +1642,7 @@ function calcBlast(fileId,conns,files){
     // Determine level based on direct dependents and functions used
     var level='low';
     var connectedFiles=files.filter(function(f){return exportedTo[f.path]||importedFrom[f.path];}).length;
-    var relativePct=connectedFiles>0?Math.round(directDeps.length/connectedFiles*100):0;
+    var relativePct=connectedFiles>0&&directDeps.length>0?Math.round(directDeps.length/connectedFiles*100):0;
 
     if(directDeps.length>=8||fnsUsed>=5)level='critical';
     else if(directDeps.length>=4||fnsUsed>=3)level='high';
@@ -1715,7 +1728,10 @@ function findSuggestedReviewers(prData, repoData) {
     });
     var reviewers = [];
     Object.entries(authorCounts).sort(function(a,b) { return b[1].count - a[1].count; }).slice(0, 3).forEach(function(entry, i) {
-        reviewers.push({ name: entry[0].charAt(0).toUpperCase() + entry[0].slice(1) + ' Expert', reason: 'Knows ' + entry[1].count + ' files in ' + entry[0], avatar: COLORS[i % COLORS.length] });
+        if(entry&&entry[0]&&entry[1]){
+            var name=entry[0].charAt(0).toUpperCase() + entry[0].slice(1);
+            reviewers.push({ name: name + ' Expert', reason: 'Knows ' + entry[1].count + ' files in ' + entry[0], avatar: COLORS[i % COLORS.length] });
+        }
     });
     return reviewers;
 }
@@ -1743,6 +1759,7 @@ function findDependencyChains(prData, repoData) {
     var changedFiles = (prData.files || []).map(function(f) { return f.filename; });
     var chains = [];
     changedFiles.slice(0, 3).forEach(function(file) {
+        if(!file)return;
         var chain = [file.split('/').pop()];
         var visited = new Set([file]);
         var queue = [file];
@@ -1860,11 +1877,11 @@ function App(){
     function parseUrl(url){
         if(!url||typeof url!=='string')return null;
         url=url.trim();
-        if(url.length>200||url.includes('{')|| url.includes('"'))return null;
+        if(url.length===0||url.length>200||url.includes('{')|| url.includes('"')||url.includes('<')||url.includes('>'))return null;
         var m=url.match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/);
-        if(m)return{owner:m[1],repo:m[2].replace(/\.git$/,'')};
+        if(m&&m[1]&&m[2])return{owner:m[1],repo:m[2].replace(/\.git$/,'')};
         var simple=url.match(/^([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)$/);
-        if(simple)return{owner:simple[1],repo:simple[2]};
+        if(simple&&simple[1]&&simple[2])return{owner:simple[1],repo:simple[2]};
         return null;
     }
 
@@ -2024,7 +2041,7 @@ function App(){
                 var totalLoc=analyzed.reduce(function(s,f){return s+f.lines;},0);
                 var langStats={};
                 analyzed.forEach(function(f){var ext=f.name.split('.').pop().toLowerCase();langStats[ext]=(langStats[ext]||0)+f.lines;});
-                var langArray=Object.entries(langStats).sort(function(a,b){return b[1]-a[1];}).map(function(e){return{ext:e[0],lines:e[1],pct:Math.round(e[1]/totalLoc*100)};});
+                var langArray=Object.entries(langStats).sort(function(a,b){return b[1]-a[1];}).map(function(e){return{ext:e[0],lines:e[1],pct:totalLoc>0?Math.round(e[1]/totalLoc*100):0};});
                 // Add duplicate issues
                 if(duplicates.length>0){
                     var nameDups=duplicates.filter(function(d){return d.type==='name';});
@@ -2282,7 +2299,11 @@ function App(){
         nodesRef.current=node;
         node.call(d3.drag().on('start',function(e,d){if(!e.active)sim.alphaTarget(0.1).restart();d.fx=d.x;d.fy=d.y;}).on('drag',function(e,d){d.fx=e.x;d.fy=e.y;}).on('end',function(e,d){if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
          node.on('click',function(e,d){e.stopPropagation();if(selectFileRef.current)selectFileRef.current(d.id);});
-        node.on('mouseenter',function(e,d){var r=svgRef.current.getBoundingClientRect();setTooltip({x:e.clientX-r.left+10,y:e.clientY-r.top,title:d.name,content:d.fnCount+' functions\n'+d.layer+' layer\n'+d.churn+' recent commits'});}).on('mouseleave',function(){setTooltip(null);});
+        node.on('mouseenter',function(e,d){
+            if(!svgRef.current)return;
+            var r=svgRef.current.getBoundingClientRect();
+            setTooltip({x:e.clientX-r.left+10,y:e.clientY-r.top,title:d.name,content:d.fnCount+' functions\n'+d.layer+' layer\n'+d.churn+' recent commits'});
+        }).on('mouseleave',function(){setTooltip(null);});
         svg.on('click',function(e){if(e.target===svgRef.current){setSelected(null);setBlastRadius(null);link.attr('stroke',theme==='light'?'#ccc':'#333').attr('stroke-opacity',0.4);node.selectAll('.nc').attr('opacity',1).attr('fill',getC);}});
         node.append('circle').attr('class','nc').attr('r',getR).attr('fill',getC).attr('stroke',function(d){var c=d3.color(getC(d));return c?c.brighter(0.3):'#fff';}).attr('stroke-width',1.5);
         node.append('text').attr('text-anchor','middle').attr('dy',0).attr('fill',theme==='light'?'#333':'#eee').attr('font-size',function(d){return Math.max(6,Math.min(10,getR(d)*0.6))+'px';}).attr('font-family','Source Code Pro Mono').attr('font-weight','500').attr('pointer-events','none').text(function(d){var n=d.name.replace(/\.[^.]+$/,'');var maxLen=Math.max(4,Math.floor(getR(d)/2));return n.length>maxLen+1?n.slice(0,maxLen)+'…':n;});
@@ -2686,6 +2707,7 @@ function App(){
         node.append('text').attr('dy','0.31em').attr('x',function(d){return d.angle>Math.PI?-14:14;}).attr('text-anchor',function(d){return d.angle>Math.PI?'end':'start';})
             .attr('fill','var(--t2)').attr('font-size','9px').text(function(d){var n=d.name.replace(/\.[^.]+$/,'');return n.length>16?n.slice(0,13)+'…':n;});
         node.on('mouseenter',function(e,d){
+            if(!bundleRef.current)return;
             var rect=bundleRef.current.getBoundingClientRect();
             tooltip.html('<div class="treemap-tooltip-title">'+d.name+'</div><div class="treemap-tooltip-stat"><span>Lines:</span><span>'+(d.lines||0)+'</span></div><div class="treemap-tooltip-stat"><span>Functions:</span><span>'+(d.fns||0)+'</span></div><div class="treemap-tooltip-stat"><span>Folder:</span><span>'+(d.folder||'root')+'</span></div>')
                 .style('display','block').style('left',(e.clientX-rect.left+15)+'px').style('top',(e.clientY-rect.top+15)+'px');
