@@ -1802,7 +1802,7 @@ function App(){
               if(i>=max){finishAnalysis();return;}
                 var f=files[i];
                 setProgress('Analyzing '+(i+1)+'/'+max+': '+f.name);
-               var isgile=f.isCode!==false&&Parser.isCode(f.name);
+               var isCodeFile=f.isCode!==false&&Parser.isCode(f.name);
                 if(isCodeFile){
                     Promise.all([
                         GitHub.getFile(p.owner,p.repo,f.path),
