@@ -4,6 +4,8 @@
 
 ### Instant Codebase Intelligence for GitHub
 
+[![Live Preview](https://img.shields.io/badge/Live-Demo-blueviolet?style=for-the-badge&logo=vercel)](https://repo-lens-iq.vercel.app)
+
 **RepoLens IQ** turns any GitHub repository into **instant, actionable insights**—right in your browser.
 
 **No installation. No backend. No tracking.**
@@ -136,7 +138,7 @@ RepoLens IQ uses a simple, privacy-first architecture:
 ## Quick Start
 
 ### Option 1: Use Online (Recommended)
-Open **RepoLens IQ** in your browser and paste any GitHub repository URL to instantly explore its structure and insights.
+Open **[RepoLens IQ](https://repo-lens-iq.vercel.app)** in your browser and paste any GitHub repository URL to instantly explore its structure and insights.
 
 → No setup. No install. No sign-up.
 
