@@ -278,7 +278,7 @@ RepoLens IQ works in all modern browsers:
 ## Limitations
 
 - **File Limit:** Analyzes up to 100 files per repository for performance (larger repos will show a warning)
-- **Language Support:** Currently supports 10 languages (see [Supported Languages](#-supported-languages))
+- **Language Support:** Currently supports 10 languages
 - **GitHub API:** Subject to GitHub's rate limits (60 requests/hour without token, 5,000 with token)
 - **Large Repositories:** Very large codebases may take longer to analyze
 - **Private Repos:** Requires a GitHub Personal Access Token
