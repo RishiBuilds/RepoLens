@@ -15,27 +15,9 @@
 
 [Quick Start](#-quick-start) • [Features](#-key-features) • [Usage](#-usage) • [Privacy](#-privacy-centric)
 
+<img src="repolens-architecture-graph.png" alt="RepoLens IQ Codebase Graph View" width="100%" height:auto/>
+
 </div>
-
----
-
-## Table of Contents
-
-- [Why RepoLens IQ?](#-why-repolens-iq)
-- [Key Features](#-key-features)
-- [Quick Start](#-quick-start)
-- [Usage](#-usage)
-- [Privacy-centric](#-privacy-centric)
-- [How It Works](#-how-it-works)
-- [Supported Languages](#-supported-languages)
-- [Visualization Modes](#-visualization-modes)
-- [Keyboard Shortcuts](#-keyboard-shortcuts)
-- [API Limits](#-api-limits)
-- [Architecture](#-architecture)
-- [Browser Compatibility](#-browser-compatibility)
-- [Limitations](#-limitations)
-- [Examples](#-examples)
-- [Contributing](#-contributing)
 
 ---
 
